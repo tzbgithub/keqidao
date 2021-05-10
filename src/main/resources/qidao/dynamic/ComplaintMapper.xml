@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.dynamic.complaint.mapper.ComplaintMapper">
+    
+    <resultMap type="com.qidao.qidao.dynamic.complaint.domain.Complaint" id="ComplaintResult">
+        <result property="level"    column="level"    />
+        <result property="replyUserName"    column="reply_user_name"    />
+        <result property="replyUserId"    column="reply_user_id"    />
+        <result property="reply"    column="reply"    />
+        <result property="status"    column="status"    />
+        <result property="reasonId"    column="reason_id"    />
+        <result property="complaintMemberId"    column="complaint_member_id"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="dynamicId"    column="dynamic_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectComplaintVo">
+        select level, reply_user_name, reply_user_id, reply, status, reason_id, complaint_member_id, member_id, dynamic_id, del_flag, update_by, create_by, update_time, create_time, id from complaint
+    </sql>
+
+    <select id="selectComplaintList" parameterType="com.qidao.qidao.dynamic.complaint.domain.Complaint" resultMap="ComplaintResult">
+        <include refid="selectComplaintVo"/>
+        <where>  
+                <if test="level != null "> and level = #{level}</if>
+                <if test="replyUserName != null  and replyUserName != ''"> and reply_user_name like concat('%', #{replyUserName}, '%')</if>
+                <if test="replyUserId != null "> and reply_user_id = #{replyUserId}</if>
+                <if test="reply != null  and reply != ''"> and reply = #{reply}</if>
+                <if test="status != null "> and status = #{status}</if>
+                <if test="reasonId != null "> and reason_id = #{reasonId}</if>
+                <if test="complaintMemberId != null "> and complaint_member_id = #{complaintMemberId}</if>
+                <if test="memberId != null "> and member_id = #{memberId}</if>
+                <if test="dynamicId != null "> and dynamic_id = #{dynamicId}</if>
+            AND del_flag = 0
+                                </where>
+                                order by status asc , level desc , create_time asc
+    </select>
+    
+    <select id="selectComplaintById" parameterType="Long" resultMap="ComplaintResult">
+        <include refid="selectComplaintVo"/>
+        where id = #{id}
+                                              AND del_flag = 0
+                            </select>
+        
+    <insert id="insertComplaint" parameterType="com.qidao.qidao.dynamic.complaint.domain.Complaint">
+        insert into complaint
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="level != null ">level,</if>
+            <if test="replyUserName != null  and replyUserName != ''">reply_user_name,</if>
+            <if test="replyUserId != null ">reply_user_id,</if>
+            <if test="reply != null  and reply != ''">reply,</if>
+            <if test="status != null ">status,</if>
+            <if test="reasonId != null ">reason_id,</if>
+            <if test="complaintMemberId != null ">complaint_member_id,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="dynamicId != null ">dynamic_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="level != null ">#{level},</if>
+            <if test="replyUserName != null  and replyUserName != ''">#{replyUserName},</if>
+            <if test="replyUserId != null ">#{replyUserId},</if>
+            <if test="reply != null  and reply != ''">#{reply},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="reasonId != null ">#{reasonId},</if>
+            <if test="complaintMemberId != null ">#{complaintMemberId},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="dynamicId != null ">#{dynamicId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateComplaint" parameterType="com.qidao.qidao.dynamic.complaint.domain.Complaint">
+        update complaint
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="level != null ">level = #{level},</if>
+            <if test="replyUserName != null  and replyUserName != ''">reply_user_name = #{replyUserName},</if>
+            <if test="replyUserId != null ">reply_user_id = #{replyUserId},</if>
+            <if test="reply != null  and reply != ''">reply = #{reply},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="reasonId != null ">reason_id = #{reasonId},</if>
+            <if test="complaintMemberId != null ">complaint_member_id = #{complaintMemberId},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="dynamicId != null ">dynamic_id = #{dynamicId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteComplaintById" parameterType="Long">
+        delete from complaint where id = #{id}
+    </delete>
+
+    <delete id="deleteComplaintByIds" parameterType="String">
+        delete from complaint where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                                <update id="logicDelByIds" parameterType="String">
+        update complaint
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

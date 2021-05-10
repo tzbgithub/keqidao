@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.dynamic.complaint.mapper.CustomComplaintMapper">
+
+    <select id="selectComplaintList" resultType="com.qidao.qidao.dynamic.complaint.domain.ComplaintDao">
+        select  c.`id` id, c.`dynamic_id` dynamicId, c.`level` level,
+                c.`reply` reply, c.`status` status, sc.`val` reason,
+                c.`reply_user_name` replyUserName, m.`name` memberName,
+                cm.`name` complaintMemberName
+        from `complaint` c
+                left join `member` m on m.`id` = c.`member_id` and m.`del_flag` = 0
+                left join `member` cm on cm.`id` = c.`complaint_member_id` and cm.`del_flag` = 0
+                left join `select_config` sc on sc.`id` = c.`reason_id` and sc.`del_flag` = 0 and sc.`status` = 0
+        where c.`del_flag` = 0
+        <if test="replyUserName != null and replyUserName != '' ">
+            and c.`reply_user_name` like
+            concat(concat('%',#{replyUserName}),'%')
+        </if>
+        <if test="status != null and status >= 0 ">
+            and c.`status` = #{status}
+        </if>
+        <if test="reply != null and reply != '' ">
+            and c.`reply` like
+            concat(concat('%',#{reply}),'%')
+        </if>
+        <if test="level != null and level >= 0 ">
+            and c.`level` = #{level}
+        </if>
+        <if test="reasonId != null and reasonId >= 0">
+            and c.`reason_id` = #{reasonId}
+        </if>
+        order by c.`status` asc, c.`level` desc, c.`create_time` asc
+    </select>
+    <select id="getComplaintDescription"
+            resultType="com.qidao.qidao.dynamic.complaint.domain.ComplaintDetailsDao">
+        SELECT
+            sco.val reason,
+            co.create_time complaintTime,
+            co.member_id complaintId,
+            cm.`name` complaintName,
+            d.title,
+            d.url,
+            d.verify_status verifyStatus,
+            d.video,
+            d.publish_time publishTime,
+            d.thumb,
+            d.img,
+            d.content,
+            dm.`name` memberName,
+            GROUP_CONCAT(c.title) channel
+        FROM `complaint` co
+                 LEFT JOIN `member` cm on co.member_id = cm.id
+                 LEFT JOIN `dynamic` d on co.dynamic_id = d.id
+                 LEFT JOIN `select_config` sco on co.reason_id = sco.id
+                 LEFT JOIN `member` dm on d.member_id = dm.id
+                 LEFT JOIN `link_dynamic_channel` ldc on d.id = ldc.dynamic_id and ldc.type = 0
+                 LEFT JOIN `channel` c on ldc.channel_id = c.id
+        where co.id =  #{complaintId}
+          and co.del_flag = 0 and cm.del_flag = 0 and dm.del_flag = 0 and d.del_flag = 0
+    </select>
+
+</mapper>

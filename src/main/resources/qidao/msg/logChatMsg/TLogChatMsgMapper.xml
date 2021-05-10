@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.msg.logChatMsg.mapper.TLogChatMsgMapper">
+    
+    <resultMap type="com.qidao.qidao.msg.logChatMsg.domain.TLogChatMsg" id="TLogChatMsgResult">
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="chatMsg"    column="chat_msg"    />
+        <result property="msgTime"    column="msg_time"    />
+        <result property="msgType"    column="msg_type"    />
+        <result property="chatType"    column="chat_type"    />
+        <result property="toEasemob"    column="to_easemob"    />
+        <result property="fromEasemobMember"    column="from_easemob_member"    />
+        <result property="toMemberId"    column="to_member_id"    />
+        <result property="fromMemberId"    column="from_member_id"    />
+        <result property="easemobMsgId"    column="easemob_msg_id"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectTLogChatMsgVo">
+        select del_flag, update_by, create_by, update_time, create_time, chat_msg, msg_time, msg_type, chat_type, to_easemob, from_easemob_member, to_member_id, from_member_id, easemob_msg_id, id from log_chat_msg
+    </sql>
+
+    <select id="selectTLogChatMsgList" parameterType="com.qidao.qidao.msg.logChatMsg.domain.LogChatMsgPageReq" resultMap="TLogChatMsgResult">
+        <include refid="selectTLogChatMsgVo"/>
+        <where>  
+            AND del_flag = 0
+                <if test="chatMsg != null and chatMsg != ''"> and chat_msg like  concat(concat('%',#{chatMsg}),'%')</if>
+                <if test="msgType != null"> and msg_type = #{msgType}</if>
+                <if test="chatType != null "> and chat_type = #{chatType}</if>
+                <if test="toMemberName != null  and toMemberName != ''"> and to_easemob like  concat(concat('%',#{toMemberName}),'%')</if>
+                <if test="fromMemberName != null  and fromMemberName != ''"> and from_easemob_member like  concat(concat('%',#{fromMemberName}),'%')</if>
+            <if test="startTime != '' and endTime != ''">
+                and msg_time between #{startTime} and #{endTime}
+            </if>
+            <if test="startTime != '' and endTime == ''">
+                and msg_time >= #{startTime}
+            </if>
+            <if test="endTime != '' and startTime == ''">
+                and msg_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+        order by msg_time desc
+    </select>
+    
+    <select id="selectTLogChatMsgById" parameterType="Long" resultMap="TLogChatMsgResult">
+        <include refid="selectTLogChatMsgVo"/>
+        where id = #{id}
+          AND del_flag = 0
+                                                                </select>
+        
+    <insert id="insertTLogChatMsg" parameterType="com.qidao.qidao.msg.logChatMsg.domain.TLogChatMsg">
+        insert into log_chat_msg
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="chatMsg != null  and chatMsg != ''">chat_msg,</if>
+            <if test="msgTime != null ">msg_time,</if>
+            <if test="msgType != null  and msgType != ''">msg_type,</if>
+            <if test="chatType != null ">chat_type,</if>
+            <if test="toEasemob != null  and toEasemob != ''">to_easemob,</if>
+            <if test="fromEasemobMember != null  and fromEasemobMember != ''">from_easemob_member,</if>
+            <if test="toMemberId != null ">to_member_id,</if>
+            <if test="fromMemberId != null ">from_member_id,</if>
+            <if test="easemobMsgId != null ">easemob_msg_id,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="chatMsg != null  and chatMsg != ''">#{chatMsg},</if>
+            <if test="msgTime != null ">#{msgTime},</if>
+            <if test="msgType != null  and msgType != ''">#{msgType},</if>
+            <if test="chatType != null ">#{chatType},</if>
+            <if test="toEasemob != null  and toEasemob != ''">#{toEasemob},</if>
+            <if test="fromEasemobMember != null  and fromEasemobMember != ''">#{fromEasemobMember},</if>
+            <if test="toMemberId != null ">#{toMemberId},</if>
+            <if test="fromMemberId != null ">#{fromMemberId},</if>
+            <if test="easemobMsgId != null ">#{easemobMsgId},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTLogChatMsg" parameterType="com.qidao.qidao.msg.logChatMsg.domain.TLogChatMsg">
+        update log_chat_msg
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="chatMsg != null  and chatMsg != ''">chat_msg = #{chatMsg},</if>
+            <if test="msgTime != null ">msg_time = #{msgTime},</if>
+            <if test="msgType != null  and msgType != ''">msg_type = #{msgType},</if>
+            <if test="chatType != null ">chat_type = #{chatType},</if>
+            <if test="toEasemob != null  and toEasemob != ''">to_easemob = #{toEasemob},</if>
+            <if test="fromEasemobMember != null  and fromEasemobMember != ''">from_easemob_member = #{fromEasemobMember},</if>
+            <if test="toMemberId != null ">to_member_id = #{toMemberId},</if>
+            <if test="fromMemberId != null ">from_member_id = #{fromMemberId},</if>
+            <if test="easemobMsgId != null ">easemob_msg_id = #{easemobMsgId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTLogChatMsgById" parameterType="Long">
+        delete from log_chat_msg where id = #{id}
+    </delete>
+
+    <delete id="deleteTLogChatMsgByIds" parameterType="String">
+        delete from log_chat_msg where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+            <update id="logicDelByIds" parameterType="String">
+        update log_chat_msg
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                                                            </mapper>

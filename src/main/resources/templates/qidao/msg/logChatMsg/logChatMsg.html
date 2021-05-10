@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('环信聊天记录列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <input type="text" placeholder="接收人或聊天室ID" name="toMemberName"/>
+                            </li>
+                            <li>
+                                <input type="text" placeholder="发送人名字" name="fromMemberName"/>
+                            </li>
+                            <li>
+                                <input type="text" placeholder="消息内容" name="chatMsg"/>
+                            </li>
+                            <li>
+                                <p>消息类型：</p>
+                                <select name="msgType">
+                                    <option value="">所有</option>
+                                    <option value="0">文本类型消息</option>
+                                    <option value="1">图片类型消息</option>
+                                    <option value="2">地址位置类型消息</option>
+                                    <option value="3">语音类型消息</option>
+                                    <option value="4">视频类型消息</option>
+                                    <option value="5">文件类型消息</option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>聊天类型：</p>
+                                <select name="chatType">
+                                    <option value="">所有</option>
+                                    <option value="0">单聊</option>
+                                    <option value="1">群聊</option>
+                                    <option value="2">聊天室</option>
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>发送时间：</p>
+                                <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+               <!-- <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="msg:logChatMsg:add">
+                    <em class="fa fa-plus"></em> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="msg:logChatMsg:edit">
+                    <em class="fa fa-edit"></em> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="msg:logChatMsg:logicRemove">
+                    <em class="fa fa-remove"></em> 逻辑删除
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="msg:logChatMsg:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>-->
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="msg:logChatMsg:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('msg:logChatMsg:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('msg:logChatMsg:remove')}]];
+        var prefix = ctx + "msg/logChatMsg";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                logicRemoveUrl: prefix + "/logicRemove",
+                exportUrl: prefix + "/export",
+                modalName: "环信聊天记录",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'fromEasemobMember',
+                    title : '发送人'
+                },
+                {
+                    field : 'toEasemob',
+                    title : '接收人/聊天室ID'
+                },
+                {
+                    field : 'chatMsg', 
+                    title : '消息内容'
+                },
+                {
+                    field : 'msgTime', 
+                    title : '消息发送时间'
+                },
+                {
+                    field : 'msgType', 
+                    title : '消息类型',
+                    formatter: function (value, row, index){
+                        switch (value){
+                            case 0: return '文本类型消息';
+                            case 1: return '图片类型消息';
+                            case 2: return '地址位置类型消息';
+                            case 3: return '语音类型消息';
+                            case 4: return '视频类型消息';
+                            case 5: return '文件类型消息';
+                            default: return value;
+                        }
+                    }
+                },
+                {
+                    field : 'chatType', 
+                    title : '聊天类型',
+                    formatter: function (value, row, index){
+                        switch (value){
+                            case 0: return '单聊';
+                            case 1: return '群聊';
+                            case 2: return '聊天室';
+                        }
+                    }
+                },
+                {
+                    field : 'id', 
+                    title : '主键',
+                    visible: false
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

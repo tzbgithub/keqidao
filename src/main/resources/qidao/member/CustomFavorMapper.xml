@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.member.favor.mapper.CustomFavorMapper">
+    <select id="getFavorPage" resultType="com.qidao.qidao.member.favor.domain.FavorPageRes" parameterType="com.qidao.qidao.member.favor.domain.FavorPageReq">
+        SELECT fa.id , fa.dynamic_id dynamicId ,fa.dynamic_title dynamicTitle , fa.dynamic_push_time dynamicPushTime,
+               me1.id dynamicPushMemberId, me1.`name` dynamicPushMemberName,
+               me2.id memberId , me2.`name` memberName
+        FROM `favor` fa
+                 LEFT JOIN `member` me1 on fa.dynamic_push_member_id = me1.id and me1.del_flag = 0
+                 LEFT JOIN `member` me2 on fa.member_id = me2.id and me2.del_flag = 0
+        where fa.del_flag = 0
+            <if test="dynamicTitle != null and dynamicTitle != ''">
+                and fa.dynamic_title like concat(concat('%',#{dynamicTitle}),'%')
+            </if>
+
+            <if test="dynamicPushMemberName != null and dynamicPushMemberName != ''">
+                and me1.`name` like concat(concat('%',#{dynamicPushMemberName}),'%')
+            </if>
+
+            <if test="memberName != null and memberName != ''">
+                and me2.`name` like concat(concat('%',#{memberName}),'%')
+            </if>
+
+            <if test="beginTime != '' and endTime != ''">
+                and fa.dynamic_push_time between #{beginTime} and #{endTime}
+            </if>
+
+            <if test="beginTime != '' and endTime == ''">
+                and fa.dynamic_push_time >= #{beginTime}
+            </if>
+
+            <if test="endTime != '' and beginTime == ''">
+                and fa.dynamic_push_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+    </select>
+    <select id="getMember" resultType="com.qidao.qidao.member.favor.domain.FavorMemberRes">
+        select id , `name`  from `member` where del_flag = 0
+        <if test="name != null and name != ''">
+            and (`name` like concat(concat('%',#{name}),'%') or
+            `phone` like concat(concat('%',#{name}),'%')
+                )
+        </if>
+    </select>
+    <select id="getDynamic" resultType="com.qidao.qidao.member.favor.domain.FavorDynamicRes">
+        select id , title from `dynamic` where del_flag = 0
+        <if test="title != null and title != '' ">
+            and title like concat(concat('%',#{title}),'%')
+        </if>
+    </select>
+
+    <resultMap id="getDynamicInfoMap" type="com.qidao.qidao.member.favor.domain.FavorDynamicInfoRes">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="publish_time" property="publishTime"/>
+        <result column="member_id" property="memberId"/>
+        <result column="like_num" property="likeNum"/>
+        <result column="comment_num" property="commentNum"/>
+        <result column="img" property="img"/>
+        <collection property="labels" ofType="com.qidao.qidao.member.favor.domain.DynamicLabel">
+            <id column="label_id" property="id"/>
+            <result column="val" property="val"/>
+        </collection>
+    </resultMap>
+    <select id="getDynamicInfo" resultMap="getDynamicInfoMap">
+        select dy.id , dy.title , dy.summary , dy.publish_time , dy.member_id , dy.like_num , dy.comment_num , dy.img,
+               ll.label_id,
+               la.val
+        from `dynamic` dy
+        left join `link_label` ll on dy.id = ll.source_id and ll.del_flag = 0 and ll.type = 0
+        left join `label` la on ll.label_id = la.id and la.del_flag = 0
+        where dy.id  = #{id} and dy.del_flag = 0
+    </select>
+</mapper>

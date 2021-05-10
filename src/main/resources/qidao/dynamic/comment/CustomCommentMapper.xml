@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.dynamic.comment.mapper.CustomCommentMapper">
+    <select id="getComment" resultType="com.qidao.qidao.dynamic.comment.domain.CommentPageRes">
+        SELECT c.id , m.`name` memberName , m.id memberId, m.phone , c.content , c.comment_time commentTime ,c.verify_status verifyStatus FROM `comment` c
+        left JOIN `member` m on c.member_id = m.id and m.del_flag = 0
+        where c.dynamic_id = #{id} and c.del_flag = 0 and m.verify_status = 2
+    </select>
+</mapper>

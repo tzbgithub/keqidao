@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.msg.msgRecord.mapper.TMsgRecordMapper">
+    
+    <resultMap type="com.qidao.qidao.msg.msgRecord.domain.TMsgRecord" id="TMsgRecordResult">
+        <result property="sendTime"    column="send_time"    />
+        <result property="sendNum"    column="send_num"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="status"    column="status"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="msgId"    column="msg_id"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectTMsgRecordVo">
+        select send_time, send_num, del_flag, update_by, create_by, update_time, create_time, status, member_id, msg_id, id from msg_record
+    </sql>
+
+    <select id="selectTMsgRecordList" parameterType="com.qidao.qidao.msg.msgRecord.domain.TMsgRecord" resultMap="TMsgRecordResult">
+        <include refid="selectTMsgRecordVo"/>
+        <where>  
+                <if test="sendTime != null "> and send_time = #{sendTime}</if>
+                <if test="sendNum != null "> and send_num = #{sendNum}</if>
+            AND del_flag = 0
+                                    <if test="status != null "> and status = #{status}</if>
+                <if test="memberId != null "> and member_id = #{memberId}</if>
+                <if test="msgId != null "> and msg_id = #{msgId}</if>
+            </where>
+    </select>
+    
+    <select id="selectTMsgRecordById" parameterType="Long" resultMap="TMsgRecordResult">
+        <include refid="selectTMsgRecordVo"/>
+        where id = #{id}
+                  AND del_flag = 0
+                                        </select>
+        
+    <insert id="insertTMsgRecord" parameterType="com.qidao.qidao.msg.msgRecord.domain.TMsgRecord">
+        insert into msg_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sendTime != null ">send_time,</if>
+            <if test="sendNum != null ">send_num,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="status != null ">status,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="msgId != null ">msg_id,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sendTime != null ">#{sendTime},</if>
+            <if test="sendNum != null ">#{sendNum},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="msgId != null ">#{msgId},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTMsgRecord" parameterType="com.qidao.qidao.msg.msgRecord.domain.TMsgRecord">
+        update msg_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sendTime != null ">send_time = #{sendTime},</if>
+            <if test="sendNum != null ">send_num = #{sendNum},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="msgId != null ">msg_id = #{msgId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTMsgRecordById" parameterType="Long">
+        delete from msg_record where id = #{id}
+    </delete>
+
+    <delete id="deleteTMsgRecordByIds" parameterType="String">
+        delete from msg_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                    <update id="logicDelByIds" parameterType="String">
+        update msg_record
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                                    </mapper>

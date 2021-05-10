@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('消息菜单类型列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="msg:menu:add">
+                    <em class="fa fa-plus"></em> 添加
+                </a>
+                <!--<a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="msg:menu:edit">
+                    <em class="fa fa-edit"></em> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="msg:menu:logicRemove">
+                    <em class="fa fa-remove"></em> 逻辑删除
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="msg:menu:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="msg:menu:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('msg:menu:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('msg:menu:remove')}]];
+        var prefix = ctx + "msg/menu";
+
+        $(function() {
+            var options = {
+                url: prefix + "/getList",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                logicRemoveUrl: prefix + "/logicRemove",
+                exportUrl: prefix + "/export",
+                modalName: "消息菜单类型",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'name',
+                    title : '菜单名称'
+                },
+                {
+                    field : 'fatherName',
+                    title : '上级菜单名称'
+                },
+                {
+                    field : 'thumb', 
+                    title : '封面图',
+                    formatter(value, row, index) {
+                        if (Bee.StringUtils.isBlank(value)) {
+                            return '-';
+                        }
+                        return $.table.imageView(Base.Picture.getDown() + value);
+                    }
+                },
+                {
+                    field : 'createBy',
+                    title : '创建人'
+                },
+                {
+                    field : 'createTime',
+                    title : '创建时间'
+                },
+                {
+                    field : 'status',
+                    title : '状态',
+                    formatter : function (value , row , index){
+                        switch (value){
+                            case 0: return '正常使用';
+                            case 1: return '已关闭';
+                        }
+                    }
+                },
+                {
+                    field : 'id', 
+                    title : '主键',
+                    visible: false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"></em>编辑</a> ');
+                        if (row.status === 0){
+                            actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="downMenu(\'' + row.id + '\')"></em>下架</a>');
+                        }
+                        if (row.status === 1){
+                            actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="upMenu(\'' + row.id + '\')"></em>上架</a>');
+                        }
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        //下架
+        function downMenu(id){
+            $.ajax({
+                url: prefix+"/close/"+id,
+                data: {},
+                type: "put",
+                dataType: "json",
+                success: function (data){
+                    if (data <= 0){
+                        $.modal.msg("下架失败请联系系统管理员", modal_status.FAIL);
+                    }
+                    $.table.refresh();
+                }
+            })
+        }
+        //上架
+        function upMenu(id){
+            $.ajax({
+                url: prefix+"/open/"+id,
+                data: { },
+                type: "put",
+                dataType: "json",
+                success: function (data){
+                    if (data <= 0){
+                        $.modal.msg("上架失败请联系系统管理员", modal_status.FAIL);
+                    }
+                    $.table.refresh();
+                }
+            })
+        }
+    </script>
+</body>
+</html>

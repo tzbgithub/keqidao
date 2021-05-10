@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('设备/成果详情')" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-equipment-edit" th:object="${achievementEquipment}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">
+                <label class="control-label col-sm-3">标题：</label>
+                <div class="col-sm-8">
+                    <input name="title" th:field="*{title}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">组织机构名称：</label>
+                <div class="col-sm-8">
+                    <input name="organizationName" th:field="*{organizationName}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">创建时间：</label>
+                <div class="col-sm-8">
+                    <input name="createTime" th:field="*{createTime}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">简介：</label>
+                <div class="col-sm-8">
+                    <textarea name="summary" th:field="*{summary}" class="form-control" rows="3" readonly></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">内容：</label>
+                <div class="col-sm-8">
+                    <textarea name="content" th:field="*{content}" class="form-control" rows="3" readonly></textarea>
+                </div>
+            </div>
+            <div class="form-group" th:if="*{url} ne null and *{url} ne '' ">
+                <label class="control-label col-sm-3">链接：</label>
+                <div class="col-sm-8">
+                    <input name="url" th:field="*{url}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group" th:if="*{thumb} ne null and *{thumb} ne ''">
+                <label class="control-label col-sm-3">封面：</label>
+                <div class="col-sm-8">
+                    <th:block th:include="code :: upload_html(imgId='thumb',showVal=*{thumb})" />
+                </div>
+            </div>
+            <div class="form-group" th:if="*{imgs} ne null and *{imgs} ne '' ">
+                <label class="control-label col-sm-3">图片：</label>
+                <div class="col-sm-8">
+                    <th:block th:include="code :: upload_html(imgId='imgs',showVal=*{imgs})" />
+                </div>
+            </div>
+            <div class="form-group" th:if="*{video} ne null and *{video} ne '' ">
+                <label class="control-label col-sm-3">视频：</label>
+                <div class="col-sm-8">
+                    <th:block th:include="code :: upload_html(imgId='video',showVal=*{video})" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">技术成熟度：</label>
+                <div class="col-sm-8">
+                    <input name="maturity" th:field="*{maturity}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+    <th:block th:include="code :: cos_img_js('imgs')"/>
+    <th:block th:include="code :: cos_img_js('video')"/>
+    <th:block th:include="code :: cos_img_js('thumb')"/>
+    <script type="text/javascript">
+        var prefix = ctx + "equipment/equipment";
+        $("#form-equipment-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            $.modal.close();
+            $.table.refresh();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.member.subscribe.mapper.CustomSubscribeMapper">
+    <update id="logicDelByMemberId" parameterType="String">
+        update subscribe
+        set del_flag = 1
+        where member_id = #{memberId}
+    </update>
+    <select id="getSubscribe" resultType="com.qidao.qidao.member.subscribe.domain.SubscribeListRes">
+        select s.id ,
+               s.member_id memberId,
+               s.subscribe_id subscribeId,
+               s.subscribe_time subscribeTime,
+               s.type,
+               s.subscribe_name subscribeName,
+               s.subscribe_type subscribeType,
+               s.subscribe_education subscribeEducation,
+               s.subscribe_belong subscribeBelong,
+               s.subscribe_position subscribePosition,
+               s.subscribe_organization_name subscribeOrganizationName,
+               m.name memberName
+        from `subscribe` s
+        left join `member` m on s.member_id = m.id and m.del_flag = 0
+        WHERE s.del_flag = 0
+        <if test="startTime != '' and endTime != ''">
+            and s.subscribe_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and s.subscribe_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and s.subscribe_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="memberName != null and memberName != ''">
+            and m.name like
+            concat(concat('%',#{memberName}),'%')
+        </if>
+        <if test="type != null and type >=0 ">
+            and s.type = #{type}
+        </if>
+        order by s.subscribe_time desc
+    </select>
+    <select id="getSubscribeById" resultType="com.qidao.qidao.member.subscribe.domain.SubscribeToEdit">
+        select s.id ,
+               s.member_id memberId,
+               s.subscribe_id subscribeId,
+               s.type,
+               m.name memberName
+        from `subscribe` s
+                 left join `member` m on s.member_id = m.id and m.del_flag = 0
+        WHERE s.del_flag = 0 and s.id = #{id}
+    </select>
+    <select id="findSubscribeMember" resultType="com.qidao.qidao.member.member.domain.Member">
+        select id , name
+        from `member`
+        where del_flag = 0
+        <if test="code != null and code != ''">
+            and (phone like concat(concat('%',#{code}),'%')
+            or
+            `name` like concat(concat('%',#{code}),'%')
+            )
+        </if>
+        <if test="ids != null and ids.size > 0">
+            and id not in
+            <foreach collection="ids" item="id" open="(" separator="," close=")" index="index">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+    <select id="findMember" resultType="com.qidao.qidao.member.member.domain.Member">
+        select id , name
+        from `member`
+        where del_flag = 0
+        <if test="code != null and code != ''">
+            and (phone like concat(concat('%',#{code}),'%')
+                    or
+                 `name` like concat(concat('%',#{code}),'%')
+                )
+        </if>
+    </select>
+    <select id="listOrganization" resultType="com.qidao.qidao.organization.organization.domain.Organization">
+        select id , name
+        from `organization`
+        where del_flag = 0
+          <if test="id != null">
+              and  id not in (#{id})
+          </if>
+          <if test="code != null and code != '' ">
+                and (id like concat(concat('%',#{code}),'%')
+              or
+              `name` like concat(concat('%',#{code}),'%')
+              )
+          </if>
+    </select>
+</mapper>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('发票列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>开票状态：</p>
+                            <select name="status">
+                                <option value="">所有</option>
+                                <option value="0">申请中</option>
+                                <option value="1">已开票</option>
+                            </select>
+                        </li>
+                        <li>
+                            <p>发送邮箱：</p>
+                            <input type="text" name="email"/>
+                        </li>
+                        <li>
+                            <p>税号：</p>
+                            <input type="text" name="dutyParagraph"/>
+                        </li>
+                        <li>
+                            <p>发票抬头：</p>
+                            <input type="text" name="invoiceHead"/>
+                        </li>
+                        <li>
+                            <p>发票类别：</p>
+                            <select name="type" th:with="type=${@dict.getType('')}">
+                                <option value="">所有</option>
+                                <!--                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>-->
+                                <option value="0">企业发票</option>
+                                <option value="1">个人发票</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em
+                                    class="fa fa-search"></em>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em
+                                    class="fa fa-refresh"></em>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="invoice:invoice:add">
+                <em class="fa fa-plus"></em> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="invoice:invoice:edit">
+                <em class="fa fa-edit"></em> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()"
+               shiro:hasPermission="invoice:invoice:logicRemove">
+                <em class="fa fa-remove"></em> 逻辑删除
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="invoice:invoice:remove">
+                <em class="fa fa-remove"></em> 删除
+            </a>
+                        <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="invoice:invoice:export">
+                            <em class="fa fa-download"></em> 导出
+                         </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('invoice:invoice:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('invoice:invoice:remove')}]];
+    var prefix = ctx + "invoice/invoice";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            logicRemoveUrl: prefix + "/logicRemove",
+            exportUrl: prefix + "/export",
+            modalName: "发票",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'status',
+                    title: '开票状态',
+                    formatter:function (status) {
+                        switch (status) {
+                            case 0 : return '<span style="color: red">申请中</span>';
+                            case 1 : return '<span style="color: green">已开票</span>'
+                        }
+                    }
+                },
+                {
+                    field: 'email',
+                    title: '发送邮箱'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    field: 'dutyParagraph',
+                    title: '税号'
+                },
+                {
+                    field: 'invoiceHead',
+                    title: '发票抬头'
+                },
+                {
+                    field: 'type',
+                    title: '发票类别',
+                    formatter:function (type) {
+                        switch (type) {
+                            case 0 : return '<span>企业发票</span>'
+                            case 1 : return '<span>个人发票</span>'
+                        }
+                    }
+                },
+                {
+                    field: 'memberName',
+                    title: '开票人用户名'
+                },
+                {
+                    field: 'organizationName',
+                    title: '组织名'
+                },
+                {
+                    field: 'id',
+                    title: '主键',
+                    visible: false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><em class="fa fa-edit"></em>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><em class="fa fa-remove"></em>删除</a>');
+                        // actions.push('<a class=" btn btn-warning btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="status(\'' + row.id + '\')"><em class="fa fa-archive"></em>重发</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    function status(id) {
+        $.ajax({
+            url: prefix + "/resendEmail",
+            data: {
+                id: id,
+            },
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $.table.refresh();
+                // alert("success")
+            },
+            error: function (data) {
+                // alert("failed")
+            }
+        })
+    }
+</script>
+</body>
+</html>

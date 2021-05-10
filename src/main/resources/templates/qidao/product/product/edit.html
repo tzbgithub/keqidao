@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改产品')" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-product-edit" th:object="${tProduct}">
+            <input name="id" id="id" th:field="*{id}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">产品名称：</label>
+                <div class="col-sm-8">
+                    <input name="name" th:field="*{name}" maxlength="16" id="name" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">产品简介：</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" maxlength="64" id="summary" th:field="*{summary}" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">产品链接：</label>
+                <div class="col-sm-8">
+                    <input name="url" th:field="*{url}" id="url" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">产品图片：</label>
+                <div class="col-sm-8">
+                    <th:block  th:include="code :: upload_html(imgId='imgs',showVal=*{imgs})" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">购买权限：</label>
+                <div class="col-sm-8">
+                    <select name="permission" id="permission" th:field="*{permission}" class="form-control">
+                        <option value="0"  >都可购买</option>
+                        <option value="1"  >只限实验室下属导师购买</option>
+                        <option value="2"  >只限企业机构购买</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">服务周期：</label>
+                <div class="col-sm-8">
+                    <input name="serverVal" id="serverVal" onkeyup="this.value=this.value.replace(/\D|^0/g,'')" th:field="*{serverVal}" placeholder="单位：分" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">排序值：</label>
+                <div class="col-sm-8">
+                    <input name="sequence" id="sequence" th:field="*{sequence}" placeholder="越大越前" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">市场价：</label>
+                <div class="col-sm-8">
+                    <input name="marketPrice" id="marketPrice" onkeyup="clearNoNum(this)" th:field="*{marketPrice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">销售价：</label>
+                <div class="col-sm-8">
+                    <input name="salePrice" id="salePrice" onkeyup="clearNoNum(this)" th:field="*{salePrice}" class="form-control" type="text" required>
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label class="col-sm-3 control-label" >附加数据：</label>
+                <div class="col-sm-8" id="extraDiv">
+                    <label class='col-sm-4 radio-inline'>
+                        <input type='checkbox' name='extra' value='1'>&nbsp;热门
+                    </label>
+                    <label class='col-sm-4 radio-inline'>
+                        <input type='checkbox' name='extra' value='2'>&nbsp;特卖优惠
+                    </label>
+                </div>
+            </div>
+            <!--<div class="form-group">
+                <label class="col-sm-3 control-label">库存：</label>
+                <div class="col-sm-8">
+                    <input name="stock" th:field="*{stock}" class="form-control" type="text">
+                </div>
+            </div>-->
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+    <th:block th:include="code :: cos_img_js('imgs')"/>
+    <script type="text/javascript">
+        var prefix = ctx + "product/product";
+        $("#form-product-edit").validate({
+            focusCleanup: true
+        });
+        $(function (){
+            var extras= [[${#lists.isEmpty(tProduct.extras) ? '[]' : tProduct.extras }]];
+                var input = $("input[type='checkbox']");
+                for (let i = 0 ; i<input.length ; i++){
+                    for (let j = 0 ; j < extras.length ; j++){
+                        var value = input[i].value;
+                        var extra = extras[j];
+                        if (value == extra){
+                            input[i].checked=true
+                        }
+                    }
+                }
+        })
+
+        function clearNoNum(obj){
+            obj.value = obj.value.replace(/[^\d.]/g,"");  //清除“数字”和“.”以外的字符
+            obj.value = obj.value.replace(/^\./g,""); //验证第一个字符是数字
+            obj.value = obj.value.replace(/\.{2,}/g,"."); //只保留第一个. 清除多余的
+            obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+            obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3');//只能输入两个小数
+            if(obj.value.indexOf(".")< 0 && obj.value !=""){//以上已经过滤，此处控制的是如果没有小数点，首位不能为类似于 01、02的金额
+                obj.value= parseFloat(obj.value);
+            }
+        }
+        function submitHandler() {
+            var extra = $("input[type='checkbox']:checked").map(function(){return $(this).val()}).get().join(',');
+            if ($.validate.form()) {
+                let marketPrice = parseFloat($("#marketPrice").val());
+                let salePrice = parseFloat($("#salePrice").val());
+                if (salePrice > marketPrice){
+                    $.modal.msg("销售价不能大于市场价", modal_status.FAIL);
+                    document.getElementById("warning").style.display="block"
+                    return ;
+                }
+                $.operate.save(prefix + "/editSave", {
+                    name: $("#name").val(),
+                    id: $("#id").val(),
+                    summary: $("#summary").val(),
+                    url: $("#url").val(),
+                    imgs: $("#imgs").val(),
+                    serverVal: $("#serverVal").val(),
+                    permission: $("#permission").val(),
+                    sequence: $("#sequence").val(),
+                    marketPrice: $("#marketPrice").val(),
+                    salePrice: $("#salePrice").val(),
+                    extra: extra
+                });
+            }
+        }
+    </script>
+</body>
+</html>

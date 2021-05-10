@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增消息')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-msg-add">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">标题：</label>
+                <div class="col-sm-8">
+                    <input name="title" maxlength="32" class="form-control" type="text" required>
+                </div>
+            </div>
+<!--            <div class="form-group">
+                <label class="col-sm-3 control-label">标题类型</label>
+                <div class="col-sm-8">
+                    <select name="titleType" class="form-control m-b">
+                        <option value="0">原文发送</option>
+                        <option value="1">验证码</option>
+                    </select>
+                </div>
+            </div>-->
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">内容：</label>
+                <div class="col-sm-8">
+                    <textarea name="content" id="content" class="form-control" rows="3" required></textarea>
+                </div>
+            </div>
+<!--            <div class="form-group">
+                <label class="col-sm-3 control-label">内容类型</label>
+                <div class="col-sm-8">
+                    <select name="contentType" class="form-control m-b">
+                        <option value="0">原文发送</option>
+                        <option value="1">验证码</option>
+                    </select>
+                </div>
+            </div>-->
+            <div class="form-group">
+                <label class="col-sm-3 control-label">消息菜单</label>
+                <div class="col-sm-8">
+                    <select name="menuId" id="menuId" class="form-control m-b">
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">消息类型：</label>
+                <div class="col-sm-8">
+                    <select name="type" class="form-control m-b">
+                        <option value="0">不推送</option>
+                        <option value="1">立即推送</option>
+                        <option value="2">每日推送</option>
+                        <option value="3">定时发送</option>
+                        <option value="4">触发类型：用户注册</option>
+                        <option value="5">滚动消息：达成合作</option>
+                        <option value="6">用户获取短信验证码</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">接收类型：</label>
+                <div class="col-sm-8">
+                    <select name="receiveType" id="receiveType" onchange="showMemberDiv()" class="form-control m-b">
+                        <option value="0">全平台发送</option>
+                        <option value="1">指定用户发送</option>
+                        <option value="2">所有VIP用户</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" id="memberDiv" style="display: none">
+                <label class="col-sm-3 control-label">接收用户：</label>
+                <div class="col-sm-3">
+                    <input id="memberName" placeholder="用户名/手机号" class="form-control" type="text" >
+                </div>
+                <div class="col-sm-1">
+                    <btn class="btn btn-info  btn-sm" onclick="searchMemberName()"><i class="fa fa-search"></i>搜索</btn>
+                </div>
+                <div class="col-sm-4">
+                    <select name="memberId" id="memberId" onchange="showMemberName()" class="form-control" required>
+                        <option value="-1">==请先搜索==</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">用户最大可接收同一消息条数：</label>
+                <div class="col-sm-8">
+                    <input class="form-control"  onkeyup="if(this.value.length===1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                    name="maxNum" type="text" placeholder="0" />
+                    <span>默认为0：不限制</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">排序值：</label>
+                <div class="col-sm-8">
+                    <input name="sequence" min="0" class="form-control" type="number" >
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">推送时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><em class="fa fa-calendar"></em></span>
+                        <input name="pushTime" class="form-control" placeholder="年：月：日 时：分：秒" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">过期时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><em class="fa fa-calendar"></em></span>
+                        <input name="expireTime" class="form-control" placeholder="年：月：日 时：分：秒" type="text" required>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "msg/msg"
+        $("#form-msg-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                var receiveType = $("#receiveType").val();
+                var memberId = $("#memberId").val();
+                if (receiveType == 1 && memberId == -1){
+                    $.modal.msg("指定用户消息请选择接收用户", modal_status.FAIL);
+                    return;
+                }
+                $.operate.save(prefix + "/save", $('#form-msg-add').serialize());
+            }
+        }
+        function showMemberDiv(){
+            var receiveType = $("#receiveType").val();
+            if (receiveType == 1){
+                $("#memberDiv").attr("style","display:block");
+            }else{
+                $("#memberDiv").attr("style","display:none");
+                $("#memberId").empty()
+                $("#memberId").append('<option value="-1">==请先搜索==</option>')
+                $("#memberName").val("")
+            }
+        }
+        $(function (){
+            $.ajax({
+                url: ctx+"msg/menu/getList",
+                data: {},
+                type: "get",
+                dataType: "json",
+                success: function (data){
+                    $("#menuId").empty();
+                    for(let i = 0 ; i<data.length ; i++){
+                        $("#menuId").append("<option value='"+data[i].id+"'>"+data[i].name+"</option>")
+                    }
+                }
+            })
+        })
+
+        function showMemberName (){
+            let obj=document.getElementById("memberId");
+            let text = '';
+            for( let i=0;i<obj.length;i++) {//下拉框的长度就是它的选项数.
+                if(obj[i].selected==true) {
+                    text=obj[i].text;//获取当前选择项的文本.
+                }
+            }
+            $("#memberName").val(text);
+        }
+
+        function searchMemberName(){
+            $.ajax({
+                url:ctx + "member/favor/getMember",
+                data:{
+                    name: $("#memberName").val()
+                },
+                type:"get",
+                dataType:"json",
+                success:function (data) {
+                    let father = data;
+                    document.getElementById("memberId").options.length = 0;
+                    if (father.length === 0){
+                        $("#memberId").append("<option value='-1'>==无结果请重新查询==</option>")
+                    }else {
+                        if (father[0].id != null) {
+                            $("#memberId").append("<option value='-1'>==请选择==</option>")
+                        }
+                        for (let i = 0; i < father.length; i++) {
+                            $("#memberId").append("<option value='" + father[i].id + "'>" + father[i].name + "</option>")
+                        }
+                    }
+                }
+            })
+        }
+        $("input[name='pushTime']").datetimepicker({
+            format: "yyyy-mm-dd HH:ii:ss",
+            minuteStep: 1
+        });
+        $("input[name='expireTime']").datetimepicker({
+            format: "yyyy-mm-dd HH:ii:ss",
+            minuteStep: 1
+        });
+
+    </script>
+</body>
+</html>

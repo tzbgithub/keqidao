@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.organization.organization.mapper.TOrganizationMapper">
+    
+    <resultMap type="com.qidao.qidao.organization.organization.domain.TOrganization" id="OrganizationResult">
+        <result property="verifyReason"    column="verify_reason"    />
+        <result property="verifyStatus"    column="verify_status"    />
+        <result property="vipEndTime"    column="vip_end_time"    />
+        <result property="vipStartTime"    column="vip_start_time"    />
+        <result property="status"    column="status"    />
+        <result property="techScaleId"    column="tech_scale_id"    />
+        <result property="addressDetail"    column="address_detail"    />
+        <result property="addressAreaName"    column="address_area_name"    />
+        <result property="addressAreaId"    column="address_area_id"    />
+        <result property="addressCityName"    column="address_city_name"    />
+        <result property="addressCityId"    column="address_city_id"    />
+        <result property="addressProvinceName"    column="address_province_name"    />
+        <result property="addressProvinceId"    column="address_province_id"    />
+        <result property="qualifications"    column="qualifications"    />
+        <result property="license"    column="license"    />
+        <result property="signTime"    column="sign_time"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="fundsId"    column="funds_id"    />
+        <result property="industryRemark"    column="industry_remark"    />
+        <result property="industryId"    column="industry_id"    />
+        <result property="summary"    column="summary"    />
+        <result property="name"    column="name"    />
+        <result property="backendImage"    column="backend_image"    />
+        <result property="responsibleMemberId"    column="responsible_member_id"    />
+        <result property="type"    column="type"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectOrganizationVo">
+        select verify_reason,belong, verify_status, vip_end_time, vip_start_time, status, tech_scale_id, address_detail, address_area_name, address_area_id, address_city_name, address_city_id, address_province_name, address_province_id, qualifications, license, sign_time, scale_id, funds_id, industry_remark, industry_id, summary, name, backend_image, responsible_member_id, type, del_flag, update_by, create_by, update_time, create_time, id from organization
+    </sql>
+
+    <select id="selectOrganizationList" parameterType="com.qidao.qidao.organization.organization.domain.TOrganization" resultMap="OrganizationResult">
+        <include refid="selectOrganizationVo"/>
+        <where>  
+                <if test="verifyReason != null  and verifyReason != ''"> and verify_reason = #{verifyReason}</if>
+                <if test="verifyStatus != null "> and verify_status = #{verifyStatus}</if>
+                <if test="vipEndTime != null "> and vip_end_time = #{vipEndTime}</if>
+                <if test="vipStartTime != null "> and vip_start_time = #{vipStartTime}</if>
+                <if test="status != null "> and status = #{status}</if>
+                <if test="techScaleId != null "> and tech_scale_id = #{techScaleId}</if>
+                <if test="addressDetail != null  and addressDetail != ''"> and address_detail = #{addressDetail}</if>
+                <if test="addressAreaName != null  and addressAreaName != ''"> and address_area_name like concat('%', #{addressAreaName}, '%')</if>
+                <if test="addressAreaId != null "> and address_area_id = #{addressAreaId}</if>
+                <if test="addressCityName != null  and addressCityName != ''"> and address_city_name like concat('%', #{addressCityName}, '%')</if>
+                <if test="addressCityId != null "> and address_city_id = #{addressCityId}</if>
+                <if test="addressProvinceName != null  and addressProvinceName != ''"> and address_province_name like concat('%', #{addressProvinceName}, '%')</if>
+                <if test="addressProvinceId != null "> and address_province_id = #{addressProvinceId}</if>
+                <if test="qualifications != null  and qualifications != ''"> and qualifications = #{qualifications}</if>
+                <if test="license != null  and license != ''"> and license = #{license}</if>
+                <if test="signTime != null "> and sign_time = #{signTime}</if>
+                <if test="scaleId != null "> and scale_id = #{scaleId}</if>
+                <if test="fundsId != null "> and funds_id = #{fundsId}</if>
+                <if test="industryRemark != null  and industryRemark != ''"> and industry_remark = #{industryRemark}</if>
+                <if test="industryId != null "> and industry_id = #{industryId}</if>
+                <if test="summary != null  and summary != ''"> and summary = #{summary}</if>
+                <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+                <if test="backendImage != null  and backendImage != ''"> and backend_image = #{backendImage}</if>
+                <if test="responsibleMemberId != null "> and responsible_member_id = #{responsibleMemberId}</if>
+                <if test="type != null "> and type = #{type}</if>
+            AND del_flag = 0
+                                </where>
+    </select>
+    
+    <select id="selectOrganizationById" parameterType="String" resultMap="OrganizationResult">
+        <include refid="selectOrganizationVo"/>
+        where id = #{id}
+                                                                                                              AND del_flag = 0
+                            </select>
+        
+    <insert id="insertOrganization" parameterType="com.qidao.qidao.organization.organization.domain.TOrganization">
+        insert into organization
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="verifyReason != null  and verifyReason != ''">verify_reason,</if>
+            <if test="belong != null ">belong,</if>
+            <if test="verifyStatus != null ">verify_status,</if>
+            <if test="vipEndTime != null ">vip_end_time,</if>
+            <if test="vipStartTime != null ">vip_start_time,</if>
+            <if test="status != null ">status,</if>
+            <if test="techScaleId != null ">tech_scale_id,</if>
+            <if test="addressDetail != null  and addressDetail != ''">address_detail,</if>
+            <if test="addressAreaName != null  and addressAreaName != ''">address_area_name,</if>
+            <if test="addressAreaId != null ">address_area_id,</if>
+            <if test="addressCityName != null  and addressCityName != ''">address_city_name,</if>
+            <if test="addressCityId != null ">address_city_id,</if>
+            <if test="addressProvinceName != null  and addressProvinceName != ''">address_province_name,</if>
+            <if test="addressProvinceId != null ">address_province_id,</if>
+            <if test="qualifications != null  and qualifications != ''">qualifications,</if>
+            <if test="license != null  and license != ''">license,</if>
+            <if test="signTime != null ">sign_time,</if>
+            <if test="scaleId != null ">scale_id,</if>
+            <if test="fundsId != null ">funds_id,</if>
+            <if test="industryRemark != null  and industryRemark != ''">industry_remark,</if>
+            <if test="industryId != null ">industry_id,</if>
+            <if test="summary != null  and summary != ''">summary,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="backendImage != null  and backendImage != ''">backend_image,</if>
+            <if test="responsibleMemberId != null ">responsible_member_id,</if>
+            <if test="type != null ">type,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null  and id != ''">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="verifyReason != null  and verifyReason != ''">#{verifyReason},</if>
+            <if test="belong != null and belong!='' ">#{belong},</if>
+            <if test="verifyStatus != null ">#{verifyStatus},</if>
+            <if test="vipEndTime != null ">#{vipEndTime},</if>
+            <if test="vipStartTime != null ">#{vipStartTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="techScaleId != null ">#{techScaleId},</if>
+            <if test="addressDetail != null  and addressDetail != ''">#{addressDetail},</if>
+            <if test="addressAreaName != null  and addressAreaName != ''">#{addressAreaName},</if>
+            <if test="addressAreaId != null ">#{addressAreaId},</if>
+            <if test="addressCityName != null  and addressCityName != ''">#{addressCityName},</if>
+            <if test="addressCityId != null ">#{addressCityId},</if>
+            <if test="addressProvinceName != null  and addressProvinceName != ''">#{addressProvinceName},</if>
+            <if test="addressProvinceId != null ">#{addressProvinceId},</if>
+            <if test="qualifications != null  and qualifications != ''">#{qualifications},</if>
+            <if test="license != null  and license != ''">#{license},</if>
+            <if test="signTime != null ">#{signTime},</if>
+            <if test="scaleId != null ">#{scaleId},</if>
+            <if test="fundsId != null ">#{fundsId},</if>
+            <if test="industryRemark != null  and industryRemark != ''">#{industryRemark},</if>
+            <if test="industryId != null ">#{industryId},</if>
+            <if test="summary != null  and summary != ''">#{summary},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="backendImage != null  and backendImage != ''">#{backendImage},</if>
+            <if test="responsibleMemberId != null ">#{responsibleMemberId},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null  and id != ''">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOrganization" parameterType="com.qidao.qidao.organization.organization.domain.TOrganization">
+        update organization
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="verifyReason != null  and verifyReason != ''">verify_reason = #{verifyReason},</if>
+            <if test="belong != null and belong != ''">belong = #{belong},</if>
+            <if test="verifyStatus != null ">verify_status = #{verifyStatus},</if>
+            <if test="vipEndTime != null ">vip_end_time = #{vipEndTime},</if>
+            <if test="vipStartTime != null ">vip_start_time = #{vipStartTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="techScaleId != null ">tech_scale_id = #{techScaleId},</if>
+            <if test="addressDetail != null  and addressDetail != ''">address_detail = #{addressDetail},</if>
+            <if test="addressAreaName != null  and addressAreaName != ''">address_area_name = #{addressAreaName},</if>
+            <if test="addressAreaId != null ">address_area_id = #{addressAreaId},</if>
+            <if test="addressCityName != null  and addressCityName != ''">address_city_name = #{addressCityName},</if>
+            <if test="addressCityId != null ">address_city_id = #{addressCityId},</if>
+            <if test="addressProvinceName != null  and addressProvinceName != ''">address_province_name = #{addressProvinceName},</if>
+            <if test="addressProvinceId != null ">address_province_id = #{addressProvinceId},</if>
+            <if test="qualifications != null  and qualifications != ''">qualifications = #{qualifications},</if>
+            <if test="license != null  and license != ''">license = #{license},</if>
+            <if test="signTime != null ">sign_time = #{signTime},</if>
+            <if test="scaleId != null ">scale_id = #{scaleId},</if>
+            <if test="fundsId != null ">funds_id = #{fundsId},</if>
+            <if test="industryRemark != null  and industryRemark != ''">industry_remark = #{industryRemark},</if>
+            <if test="industryId != null ">industry_id = #{industryId},</if>
+            <if test="summary != null  and summary != ''">summary = #{summary},</if>
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="backendImage != null  and backendImage != ''">backend_image = #{backendImage},</if>
+            <if test="responsibleMemberId != null ">responsible_member_id = #{responsibleMemberId},</if>
+            <if test="type != null ">type = #{type},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOrganizationById" parameterType="String">
+        delete from organization where id = #{id}
+    </delete>
+
+    <delete id="deleteOrganizationByIds" parameterType="String">
+        delete from organization where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                                                                                                <update id="logicDelByIds" parameterType="String">
+        update organization
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

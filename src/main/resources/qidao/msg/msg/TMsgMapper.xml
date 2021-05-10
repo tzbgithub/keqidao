@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.msg.msg.mapper.TMsgMapper">
+    
+    <resultMap type="com.qidao.qidao.msg.msg.domain.TMsg" id="TMsgResult">
+        <result property="titleType"    column="title_type"    />
+        <result property="contentType"    column="content_type"    />
+        <result property="maxNum"    column="max_num"    />
+        <result property="receiveType"    column="receive_type"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="sequence"    column="sequence"    />
+        <result property="pushTime"    column="push_time"    />
+        <result property="expireTime"    column="expire_time"    />
+        <result property="status"    column="status"    />
+        <result property="type"    column="type"    />
+        <result property="content"    column="content"    />
+        <result property="title"    column="title"    />
+        <result property="menuId"    column="menu_id"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectTMsgVo">
+        select title_type, content_type, max_num, receive_type, del_flag, update_by, create_by, update_time, create_time, sequence, push_time, expire_time, status, type, content, title, menu_id, id from msg
+    </sql>
+
+    <select id="selectTMsgList" parameterType="com.qidao.qidao.msg.msg.domain.TMsg" resultMap="TMsgResult">
+        <include refid="selectTMsgVo"/>
+        <where>  
+                <if test="titleType != null "> and title_type = #{titleType}</if>
+                <if test="contentType != null "> and content_type = #{contentType}</if>
+                <if test="maxNum != null "> and max_num = #{maxNum}</if>
+                <if test="receiveType != null "> and receive_type = #{receiveType}</if>
+            AND del_flag = 0
+                                    <if test="sequence != null "> and sequence = #{sequence}</if>
+                <if test="pushTime != null "> and push_time = #{pushTime}</if>
+                <if test="expireTime != null "> and expire_time = #{expireTime}</if>
+                <if test="status != null "> and status = #{status}</if>
+                <if test="type != null "> and type = #{type}</if>
+                <if test="content != null  and content != ''"> and content = #{content}</if>
+                <if test="title != null  and title != ''"> and title = #{title}</if>
+                <if test="menuId != null "> and menu_id = #{menuId}</if>
+            </where>
+    </select>
+    
+    <select id="selectTMsgById" parameterType="Long" resultMap="TMsgResult">
+        <include refid="selectTMsgVo"/>
+        where id = #{id}
+                          AND del_flag = 0
+                                                            </select>
+        
+    <insert id="insertTMsg" parameterType="com.qidao.qidao.msg.msg.domain.TMsg">
+        insert into msg
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="titleType != null ">title_type,</if>
+            <if test="contentType != null ">content_type,</if>
+            <if test="maxNum != null ">max_num,</if>
+            <if test="receiveType != null ">receive_type,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="sequence != null ">sequence,</if>
+            <if test="pushTime != null ">push_time,</if>
+            <if test="expireTime != null ">expire_time,</if>
+            <if test="status != null ">status,</if>
+            <if test="type != null ">type,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="title != null  and title != ''">title,</if>
+            <if test="menuId != null ">menu_id,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="titleType != null ">#{titleType},</if>
+            <if test="contentType != null ">#{contentType},</if>
+            <if test="maxNum != null ">#{maxNum},</if>
+            <if test="receiveType != null ">#{receiveType},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="sequence != null ">#{sequence},</if>
+            <if test="pushTime != null ">#{pushTime},</if>
+            <if test="expireTime != null ">#{expireTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="menuId != null ">#{menuId},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTMsg" parameterType="com.qidao.qidao.msg.msg.domain.TMsg">
+        update msg
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="titleType != null ">title_type = #{titleType},</if>
+            <if test="contentType != null ">content_type = #{contentType},</if>
+            <if test="maxNum != null ">max_num = #{maxNum},</if>
+            <if test="receiveType != null ">receive_type = #{receiveType},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="sequence != null ">sequence = #{sequence},</if>
+            <if test="pushTime != null ">push_time = #{pushTime},</if>
+            <if test="expireTime != null ">expire_time = #{expireTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="type != null ">type = #{type},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="menuId != null ">menu_id = #{menuId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTMsgById" parameterType="Long">
+        delete from msg where id = #{id}
+    </delete>
+
+    <delete id="deleteTMsgByIds" parameterType="String">
+        delete from msg where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                            <update id="logicDelByIds" parameterType="String">
+        update msg
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                                                        </mapper>

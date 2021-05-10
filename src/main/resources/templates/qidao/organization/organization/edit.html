@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('修改组织机构')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-organization-edit" th:object="${organization}">
+        <input name="id" id="id" th:field="*{id}" type="hidden">
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">名称：</label>
+            <div class="col-sm-8">
+                <input name="name" id="name" maxlength="16" th:field="*{name}" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group" th:if="*{type} eq 0 ">
+            <label class="col-sm-3 control-label">简介：</label>
+            <div class="col-sm-8">
+                <textarea name="summary" maxlength="64" id="summary" th:field = "*{summary}"  class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group" th:if="*{type} eq 0">
+            <label class="col-sm-3 control-label">所属单位：</label>
+            <div class="col-sm-8">
+                <input name="belong" id="belong"  maxlength="32" th:field="*{belong}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">负责人：</label>
+            <div class="col-sm-8">
+                <select id="responsibleMemberId" class="form-control" th:field="*{responsibleMemberId}"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">规模：</label>
+            <div class="col-sm-8">
+                <select id="scaleId" th:field="*{scaleId}" class="form-control"></select>
+            </div>
+        </div>
+        <!--<div class="form-group">
+            <label class="col-sm-3 control-label">经费：</label>
+            <div class="col-sm-8">
+                <input name="fundsId" id="fundsId" placeholder="单位：万元" th:field="*{fundsId}" class="form-control"
+                       type="number" step="1"  min="0" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required>
+            </div>
+        </div>-->
+        <div class="form-group">
+            <label class="col-sm-3 control-label">地址：</label>
+            <div class="col-sm-8">
+                <select id="province" name="province" onchange="getCity()" class="form-control">
+                    <!--
+                                            <option value="">-&#45;&#45;请选择省-&#45;&#45;</option>
+                    -->
+                </select>
+                <select id="city" name="city" onchange="getArea()" class="form-control">
+                    <!--
+                                            <option value="">-&#45;&#45;请选择市-&#45;&#45;</option>
+                    -->
+                </select>
+                <select id="area" name="area" class="form-control">
+                    <!--
+                                            <option value="">-&#45;&#45;请选择区-&#45;&#45;</option>
+                    -->
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<script type="text/javascript">
+    var prefix = ctx + "organization/organization";
+    var configPrefix = ctx + "config/select/getConfigByType/"
+    var addressPrefix = ctx + "address"
+    var provinceCode = [[${organization.addressProvinceId}]];
+    var cityCode = [[${organization.addressCityId}]];
+    var areaCode = [[${organization.addressAreaId}]];
+    var memberId = [[${organization.responsibleMemberId}]];
+    var scaleId = [[${organization.scaleId}]];
+    var type = [[${organization.type}]];
+    $("#form-organization-edit").validate({
+        focusCleanup: true
+    });
+    $(function () {
+        //规模
+        $.ajax({
+            url: configPrefix + 1,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    $("#scaleId").append("<option value='" + data[i].id + "'>" + data[i].val + "</option>")
+                }
+                $("#scaleId").find("option[value='" + scaleId + "']").attr("selected", true)
+            }
+        })
+        // responsibleMemberId
+        $.ajax({
+            url: prefix + "/getOrganMember/" + [[${organization.id}]],
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    $("#responsibleMemberId").append("<option value='" + data[i].id + "'>" + data[i].name + "</option>")
+                }
+                $("#responsibleMemberId").find("option[value='" + memberId + "']").attr("selected", true)
+            }
+        })
+        //省
+        $.ajax({
+            url: addressPrefix + "/getProvince",
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    $("#province").append("<option value='" + data[i].provinceCode + "'>" + data[i].provinceName + "</option>")
+                }
+                $("#province").find("option[value='" + provinceCode + "']").attr("selected", true);
+                getCity2(provinceCode)
+
+
+            }
+        })
+    })
+
+    function getCity() {
+        let val = $("#province").val();
+        $.ajax({
+            url: addressPrefix + "/getCity/" + val,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#city").empty();
+                $("#city").append("<option value='0'>---请选择市---</option>")
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for (let i = 0; i < data.length; i++) {
+                    $("#city").append("<option value='" + data[i].cityCode + "'>" + data[i].cityName + "</option>")
+                }
+            }
+        })
+    }
+
+    function getArea() {
+        let val = $("#city").val();
+        $.ajax({
+            url: addressPrefix + "/getArea/" + val,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for (let i = 0; i < data.length; i++) {
+                    $("#area").append("<option value='" + data[i].areaCode + "'>" + data[i].areaName + "</option>")
+                }
+            }
+        })
+    }
+
+    function getCity2(val) {
+        $.ajax({
+            url: addressPrefix + "/getCity/" + val,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#city").empty();
+                $("#city").append("<option value='0'>---请选择市---</option>")
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for (let i = 0; i < data.length; i++) {
+                    $("#city").append("<option value='" + data[i].cityCode + "'>" + data[i].cityName + "</option>")
+                }
+                $("#city").find("option[value='" + cityCode + "']").attr("selected", true)
+                getArea2(cityCode)
+            }
+        })
+    }
+
+    function getArea2(val) {
+        $.ajax({
+            url: addressPrefix + "/getArea/" + val,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for (let i = 0; i < data.length; i++) {
+                    $("#area").append("<option value='" + data[i].areaCode + "'>" + data[i].areaName + "</option>")
+                }
+                $("#area").find("option[value='" + areaCode + "']").attr("selected", true)
+            }
+        })
+    }
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            let oldBelong = '[[${organization.belong}]]'
+            let oldName = '[[${organization.name}]]'
+            var province = parseInt($("#province").val());
+            var city = parseInt($("#city").val());
+            var area = parseInt($("#area").val());
+            if (province === 0 || city === 0 || area === 0) {
+                $.modal.msg("请填写完整的地址", modal_status.FAIL);
+                return;
+            }
+            $.operate.save(prefix + "/update", {
+                type: type,
+                oldBelong: oldBelong,
+                oldName: oldName,
+                summary: $("#summary").val(),
+                scaleId: $("#scaleId").val(),
+                id: $("#id").val(),
+                name: $("#name").val(),
+                //fundsId: $("#fundsId").val(),
+                belong: $("#belong").val(),
+                responsibleMemberId: $("#responsibleMemberId").val(),
+                addressProvinceId: $("#province").val(),
+                addressProvinceName: $("#province").find("option:selected").text(),
+                addressCityId: $("#city").val(),
+                addressCityName: $("#city").find("option:selected").text(),
+                addressAreaId: $("#area").val(),
+                addressAreaName: $("#area").find("option:selected").text(),
+            });
+        }
+    }
+</script>
+</body>
+</html>

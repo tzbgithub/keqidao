@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('产品列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>产品名：</p>
+                                <input type="text" name="name"/>
+                            </li>
+                            <li>
+                                <p>状态：</p>
+                                <select name="status">
+                                    <option value="">所有</option>
+                                    <option value="0">已上架</option>
+                                    <option value="1">未上架</option>
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>发布时间：</p>
+                                <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="product:product:add">
+                    <em class="fa fa-plus"></em> 添加
+                </a>
+                <!--<a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="product:product:edit">
+                    <em class="fa fa-edit"></em> 修改
+                </a>-->
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="product:product:logicRemove">
+                    <em class="fa fa-remove"></em> 逻辑删除
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="product:product:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>
+                <!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="product:product:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('product:product:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('product:product:remove')}]];
+        var prefix = ctx + "product/product";
+
+        $(function() {
+            var options = {
+                url: prefix + "/getList",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                logicRemoveUrl: prefix + "/logicRemove",
+                exportUrl: prefix + "/export",
+                modalName: "产品",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'name',
+                    title : '产品名'
+                },
+                {
+                    field : 'summary',
+                    title : '产品简介'
+                },
+                {
+                    field: 'imgs',
+                    title: '产品图片',
+                    formatter(value, row, index) {
+                        if (Bee.StringUtils.isBlank(value)) {
+                            return '-';
+                        }
+                        return $.table.imageView(Base.Picture.getDown() + value);
+                    }
+                },
+                {
+                    field: 'salePrice',
+                    title: '价格'
+                },
+                {
+                    field: 'status',
+                    title: '状态',
+                    formatter: function(value, row, index) {
+                        switch (value) {
+                            case 0 : return '已上架';
+                            case 1 : return '未上架';
+                        }
+                    }
+                },
+                {
+                    field: 'createTime',
+                    title: '发布时间'
+                },
+                {
+                    field: 'updateName',
+                    title: '编辑人'
+                },
+
+                {
+                    field : 'id',
+                    title : '主键',
+                    visible: false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><em class="fa fa-edit"></em>编辑</a> ');
+                        if(parseInt(row.status) === 0){
+                            actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="stockFromSale(\'' + row.id + '\')"><em class="fa fa-edit"></em>下架</a> ');
+                        }
+                        if(parseInt(row.status) === 1){
+                            actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="shelves(\'' + row.id + '\')"><em class="fa fa-edit"></em>上架</a> ');
+                        }
+/*
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><em class="fa fa-remove"></em>删除</a>');
+*/
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        //上架
+        function shelves(id){
+            $.ajax({
+                url: prefix+"/shelves/"+id,
+                data:{},
+                type: "get",
+                dataType: "json",
+                success: function (data){
+                    if (data > 0){
+                        $.table.refresh();
+                    }
+                }
+
+            })
+        }
+        function stockFromSale(id){
+            $.ajax({
+                url: prefix+"/stockFromSale/"+id,
+                data:{},
+                type: "get",
+                dataType: "json",
+                success: function (data){
+                    if (data > 0){
+                        $.table.refresh();
+                    }
+                }
+
+            })
+        }
+    </script>
+</body>
+</html>

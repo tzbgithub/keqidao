@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.server.server.mapper.TServerMapper">
+    
+    <resultMap type="com.qidao.qidao.server.server.domain.TServer" id="TServerResult">
+        <result property="solutionTime"    column="solution_time"    />
+        <result property="url"    column="url"    />
+        <result property="thumb"    column="thumb"    />
+        <result property="description"    column="description"    />
+        <result property="specAmountId"    column="spec_amount_id"    />
+        <result property="specAreaId"    column="spec_area_id"    />
+        <result property="addressAreaName"    column="address_area_name"    />
+        <result property="addressAreaId"    column="address_area_id"    />
+        <result property="addressCityName"    column="address_city_name"    />
+        <result property="addressCityId"    column="address_city_id"    />
+        <result property="addressProvinceName"    column="address_province_name"    />
+        <result property="addressProvinceId"    column="address_province_id"    />
+        <result property="title"    column="title"    />
+        <result property="status"    column="status"    />
+        <result property="memberIdPartyB"    column="member_id_party_b"    />
+        <result property="memberIdPartyA"    column="member_id_party_a"    />
+        <result property="organizedIdPartyB"    column="organized_id_party_b"    />
+        <result property="organizedIdPartyA"    column="organized_id_party_a"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectTServerVo">
+        select solution_time, url, thumb, description, spec_amount_id, spec_area_id, address_area_name, address_area_id, address_city_name, address_city_id, address_province_name, address_province_id, title, status, member_id_party_b, member_id_party_a, organized_id_party_b, organized_id_party_a, del_flag, update_by, create_by, update_time, create_time, id from server
+    </sql>
+
+    <select id="selectTServerList" parameterType="com.qidao.qidao.server.server.domain.TServer" resultMap="TServerResult">
+        <include refid="selectTServerVo"/>
+        <where>  
+                <if test="solutionTime != null "> and solution_time = #{solutionTime}</if>
+                <if test="url != null  and url != ''"> and url = #{url}</if>
+                <if test="thumb != null  and thumb != ''"> and thumb = #{thumb}</if>
+                <if test="description != null  and description != ''"> and description = #{description}</if>
+                <if test="specAmountId != null "> and spec_amount_id = #{specAmountId}</if>
+                <if test="specAreaId != null "> and spec_area_id = #{specAreaId}</if>
+                <if test="addressAreaName != null  and addressAreaName != ''"> and address_area_name like concat('%', #{addressAreaName}, '%')</if>
+                <if test="addressAreaId != null "> and address_area_id = #{addressAreaId}</if>
+                <if test="addressCityName != null  and addressCityName != ''"> and address_city_name like concat('%', #{addressCityName}, '%')</if>
+                <if test="addressCityId != null "> and address_city_id = #{addressCityId}</if>
+                <if test="addressProvinceName != null  and addressProvinceName != ''"> and address_province_name like concat('%', #{addressProvinceName}, '%')</if>
+                <if test="addressProvinceId != null "> and address_province_id = #{addressProvinceId}</if>
+                <if test="title != null  and title != ''"> and title = #{title}</if>
+                <if test="status != null "> and status = #{status}</if>
+                <if test="memberIdPartyB != null "> and member_id_party_b = #{memberIdPartyB}</if>
+                <if test="memberIdPartyA != null "> and member_id_party_a = #{memberIdPartyA}</if>
+                <if test="organizedIdPartyB != null "> and organized_id_party_b = #{organizedIdPartyB}</if>
+                <if test="organizedIdPartyA != null "> and organized_id_party_a = #{organizedIdPartyA}</if>
+            AND del_flag = 0
+                                </where>
+    </select>
+    
+    <select id="selectTServerById" parameterType="Long" resultMap="TServerResult">
+        <include refid="selectTServerVo"/>
+        where id = #{id}
+                                                                                  AND del_flag = 0
+                            </select>
+        
+    <insert id="insertTServer" parameterType="com.qidao.qidao.server.server.domain.TServer">
+        insert into server
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="solutionTime != null ">solution_time,</if>
+            <if test="url != null  and url != ''">url,</if>
+            <if test="thumb != null  and thumb != ''">thumb,</if>
+            <if test="description != null  and description != ''">description,</if>
+            <if test="specAmountId != null ">spec_amount_id,</if>
+            <if test="specAreaId != null ">spec_area_id,</if>
+            <if test="addressAreaName != null  and addressAreaName != ''">address_area_name,</if>
+            <if test="addressAreaId != null ">address_area_id,</if>
+            <if test="addressCityName != null  and addressCityName != ''">address_city_name,</if>
+            <if test="addressCityId != null ">address_city_id,</if>
+            <if test="addressProvinceName != null  and addressProvinceName != ''">address_province_name,</if>
+            <if test="addressProvinceId != null ">address_province_id,</if>
+            <if test="title != null  and title != ''">title,</if>
+            <if test="status != null ">status,</if>
+            <if test="memberIdPartyB != null ">member_id_party_b,</if>
+            <if test="memberIdPartyA != null ">member_id_party_a,</if>
+            <if test="organizedIdPartyB != null ">organized_id_party_b,</if>
+            <if test="organizedIdPartyA != null ">organized_id_party_a,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="solutionTime != null ">#{solutionTime},</if>
+            <if test="url != null  and url != ''">#{url},</if>
+            <if test="thumb != null  and thumb != ''">#{thumb},</if>
+            <if test="description != null  and description != ''">#{description},</if>
+            <if test="specAmountId != null ">#{specAmountId},</if>
+            <if test="specAreaId != null ">#{specAreaId},</if>
+            <if test="addressAreaName != null  and addressAreaName != ''">#{addressAreaName},</if>
+            <if test="addressAreaId != null ">#{addressAreaId},</if>
+            <if test="addressCityName != null  and addressCityName != ''">#{addressCityName},</if>
+            <if test="addressCityId != null ">#{addressCityId},</if>
+            <if test="addressProvinceName != null  and addressProvinceName != ''">#{addressProvinceName},</if>
+            <if test="addressProvinceId != null ">#{addressProvinceId},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="memberIdPartyB != null ">#{memberIdPartyB},</if>
+            <if test="memberIdPartyA != null ">#{memberIdPartyA},</if>
+            <if test="organizedIdPartyB != null ">#{organizedIdPartyB},</if>
+            <if test="organizedIdPartyA != null ">#{organizedIdPartyA},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTServer" parameterType="com.qidao.qidao.server.server.domain.TServer">
+        update server
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="solutionTime != null ">solution_time = #{solutionTime},</if>
+            <if test="url != null  and url != ''">url = #{url},</if>
+            <if test="thumb != null  and thumb != ''">thumb = #{thumb},</if>
+            <if test="description != null  and description != ''">description = #{description},</if>
+            <if test="specAmountId != null ">spec_amount_id = #{specAmountId},</if>
+            <if test="specAreaId != null ">spec_area_id = #{specAreaId},</if>
+            <if test="addressAreaName != null  and addressAreaName != ''">address_area_name = #{addressAreaName},</if>
+            <if test="addressAreaId != null ">address_area_id = #{addressAreaId},</if>
+            <if test="addressCityName != null  and addressCityName != ''">address_city_name = #{addressCityName},</if>
+            <if test="addressCityId != null ">address_city_id = #{addressCityId},</if>
+            <if test="addressProvinceName != null  and addressProvinceName != ''">address_province_name = #{addressProvinceName},</if>
+            <if test="addressProvinceId != null ">address_province_id = #{addressProvinceId},</if>
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="memberIdPartyB != null ">member_id_party_b = #{memberIdPartyB},</if>
+            <if test="memberIdPartyA != null ">member_id_party_a = #{memberIdPartyA},</if>
+            <if test="organizedIdPartyB != null ">organized_id_party_b = #{organizedIdPartyB},</if>
+            <if test="organizedIdPartyA != null ">organized_id_party_a = #{organizedIdPartyA},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTServerById" parameterType="Long">
+        delete from server where id = #{id}
+    </delete>
+
+    <delete id="deleteTServerByIds" parameterType="String">
+        delete from server where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                                                                    <update id="logicDelByIds" parameterType="String">
+        update server
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

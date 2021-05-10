@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.config.select.mapper.CustomSelectConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.qidao.qidao.config.select.domain.CustomSelectConfig">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="pid" jdbcType="BIGINT" property="pid" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="val" jdbcType="VARCHAR" property="val" />
+        <result column="sequence" jdbcType="INTEGER" property="sequence" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="del_flag" jdbcType="TINYINT" property="delFlag" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    id, pid, type, val, sequence, status,del_flag
+  </sql>
+
+    <select id="getAllFather" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+         from `select_config` where pid = 0 and `type` = #{type}
+    </select>
+    <select id="getConfigByType" resultType="com.qidao.qidao.config.select.domain.CustomSelectConfig">
+        select <include refid="Base_Column_List" />
+        from `select_config`
+        where type = #{type} and del_flag = 0 and status = 0
+        order by sequence desc
+    </select>
+    <select id="getHotIndustry" resultType="com.qidao.qidao.config.select.domain.CustomSelectConfig">
+        select id , pid , val , status , hot from `select_config` where del_flag = 0 and status = 0
+        <if test="val != null and val != ''">
+            and val like concat(concat('%',#{val}),'%')
+        </if>
+        <if test="pid != null">
+            and pid = #{pid}
+        </if>
+        <if test="pid == null">
+            and pid != 0
+        </if>
+        <if test="status != null">
+          and status = #{status}
+        </if>
+        and type = 6
+order by sequence desc
+    </select>
+
+    <insert id="create" parameterType="com.qidao.qidao.config.select.domain.CustomSelectConfig" >
+    insert into select_config (id, pid, type, val, sequence, status,del_flag)
+    values (#{id,jdbcType=BIGINT}, #{pid,jdbcType=BIGINT}, #{type,jdbcType=INTEGER},
+            #{val,jdbcType=VARCHAR}, #{sequence,jdbcType=INTEGER}, #{status,jdbcType=INTEGER},
+            #{delFlag,jdbcType=TINYINT})
+    </insert>
+
+    <update id="updateStatus">
+    update select_config
+    set
+    status = #{status}
+    where id = #{id}
+    </update>
+    <update id="hot">
+        update `select_config`
+        set
+        hot = 1
+        where id = #{id}
+    </update>
+    <update id="notHot">
+        update `select_config`
+        set
+        hot = 0
+        where id = #{id}
+    </update>
+</mapper>

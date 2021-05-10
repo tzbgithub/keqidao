@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('设备/成果详情')" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-equipment-edit" th:object="${achievementEquipment}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">
+                <label class="control-label col-sm-3">标题：</label>
+                <div class="col-sm-8">
+                    <input name="title" th:field="*{title}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">组织机构名称：</label>
+                <div class="col-sm-8">
+                    <input name="organizationName" th:field="*{organizationName}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">创建时间：</label>
+                <div class="col-sm-8">
+                    <input name="createTime" th:field="*{createTime}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">简介：</label>
+                <div class="col-sm-8">
+                    <textarea name="summary" th:field="*{summary}" class="form-control" rows="3" readonly></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">内容：</label>
+                <div class="col-sm-8">
+                    <textarea name="content" th:field="*{content}" class="form-control" rows="3" readonly></textarea>
+                </div>
+            </div>
+            <div class="form-group" th:if="*{url} ne null and *{url} ne '' ">
+                <label class="control-label col-sm-3">链接：</label>
+                <div class="col-sm-8">
+                    <input name="url" th:field="*{url}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group" th:if="*{imgList} ne null">
+                <label class="col-sm-3 control-label">图片：</label>
+                <div class="col-sm-9" id="imgDiv">
+                </div>
+            </div>
+
+            <div class="form-group" th:if="*{thumb} ne null and *{thumb} ne ''">
+                <label class="col-sm-3 control-label">封面：</label>
+                <div class="col-sm-9">
+                    <img id="thumbImg" class="col-sm-5" src="" width="500px" height="200px">
+                </div>
+            </div>
+
+            <div class="form-group" th:if="*{video} ne null and *{video} ne ''">
+                <label class="col-sm-3 control-label">视频：</label>
+                <div class="col-sm-9">
+                    <video  src="" width="400px" height="200px" id="video" controls></video>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3">技术成熟度：</label>
+                <div class="col-sm-8">
+                    <input name="maturity" th:field="*{maturity}" class="form-control" type="text" readonly>
+                </div>
+            </div><div class="form-group">
+                <label class="control-label col-sm-3">合作类型：</label>
+                <div class="col-sm-8">
+                    <input name="cooperation" th:field="*{cooperation}" class="form-control" type="text" readonly>
+                </div>
+            </div><div class="form-group">
+                <label class="control-label col-sm-3">发布类型：</label>
+                <div class="col-sm-8">
+                    <input name="articles" th:field="*{articles}" class="form-control" type="text" readonly>
+                </div>
+            </div><div class="form-group">
+                <label class="control-label col-sm-3">标签：</label>
+                <div class="col-sm-8">
+                    <input name="labels" th:field="*{labels}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+<!--    <th:block th:include="code :: cos_img_js_mult(imgs,9)"/>
+    <th:block th:include="code :: cos_img_js('video')"/>
+    <th:block th:include="code :: cos_img_js('thumb')"/>-->
+    <script type="text/javascript" th:inline="javascript">
+        var imgPrefix = Base.Picture.getDown();
+        //var thumb = [[${#strings.isEmpty(achievementEquipment.thumb) ? '' : achievementEquipment.thumb}]];
+        var video = [[${achievementEquipment.video}]];
+        var thumb = [[${achievementEquipment.thumb}]];
+        var imgs = [[${achievementEquipment.imgList}]];
+        var prefix = ctx + "equipment/equipment";
+        $("#form-equipment-edit").validate({
+            focusCleanup: true
+        });
+
+        $(function (){
+            if (Bee.StringUtils.isNotEmpty(thumb)){
+                $("#thumbImg").attr('src' ,imgPrefix + thumb);
+            }
+            if (Bee.StringUtils.isNotEmpty(video)){
+                $("#video").attr('src' ,imgPrefix + video);
+            }
+            if (imgs != null && imgs.length > 0){
+                for (let i = 0; i < imgs.length; i++) {
+                    var image =imgPrefix + imgs[i];
+                    let html = '<img src="'+image+'" width="200px" height="200px">';
+                    $("#imgDiv").append(html)
+                }
+            }
+        })
+
+        function submitHandler() {
+            $.operate.save(prefix + "/verifyPass/"+[[${achievementEquipment.id}]]+"/审核通过",null);
+        }
+    </script>
+</body>
+</html>

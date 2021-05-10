@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.dynamic.comment.mapper.TCommentMapper">
+    
+    <resultMap type="com.qidao.qidao.dynamic.comment.domain.TComment" id="TCommentResult">
+        <result property="likeNum"    column="like_num"    />
+        <result property="commentTime"    column="comment_time"    />
+        <result property="content"    column="content"    />
+        <result property="memberHeadImg"    column="member_head_img"    />
+        <result property="dynamicId"    column="dynamic_id"    />
+        <result property="memberName"    column="member_name"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectTCommentVo">
+        select like_num, comment_time, content, member_head_img, dynamic_id, member_name, member_id, del_flag, update_by, create_by, update_time, create_time, id from comment
+    </sql>
+
+    <select id="selectTCommentList" parameterType="com.qidao.qidao.dynamic.comment.domain.TComment" resultMap="TCommentResult">
+        <include refid="selectTCommentVo"/>
+        <where>  
+                <if test="likeNum != null "> and like_num = #{likeNum}</if>
+                <if test="commentTime != null "> and comment_time = #{commentTime}</if>
+                <if test="content != null  and content != ''"> and content = #{content}</if>
+                <if test="memberHeadImg != null  and memberHeadImg != ''"> and member_head_img = #{memberHeadImg}</if>
+                <if test="dynamicId != null "> and dynamic_id = #{dynamicId}</if>
+                <if test="memberName != null  and memberName != ''"> and member_name like concat('%', #{memberName}, '%')</if>
+                <if test="memberId != null "> and member_id = #{memberId}</if>
+            AND del_flag = 0
+                                </where>
+    </select>
+    
+    <select id="selectTCommentById" parameterType="Long" resultMap="TCommentResult">
+        <include refid="selectTCommentVo"/>
+        where id = #{id}
+                                      AND del_flag = 0
+                            </select>
+        
+    <insert id="insertTComment" parameterType="com.qidao.qidao.dynamic.comment.domain.TComment">
+        insert into comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="likeNum != null ">like_num,</if>
+            <if test="commentTime != null ">comment_time,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="memberHeadImg != null  and memberHeadImg != ''">member_head_img,</if>
+            <if test="dynamicId != null ">dynamic_id,</if>
+            <if test="memberName != null  and memberName != ''">member_name,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="likeNum != null ">#{likeNum},</if>
+            <if test="commentTime != null ">#{commentTime},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="memberHeadImg != null  and memberHeadImg != ''">#{memberHeadImg},</if>
+            <if test="dynamicId != null ">#{dynamicId},</if>
+            <if test="memberName != null  and memberName != ''">#{memberName},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTComment" parameterType="com.qidao.qidao.dynamic.comment.domain.TComment">
+        update comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="likeNum != null ">like_num = #{likeNum},</if>
+            <if test="commentTime != null ">comment_time = #{commentTime},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="memberHeadImg != null  and memberHeadImg != ''">member_head_img = #{memberHeadImg},</if>
+            <if test="dynamicId != null ">dynamic_id = #{dynamicId},</if>
+            <if test="memberName != null  and memberName != ''">member_name = #{memberName},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTCommentById" parameterType="Long">
+        delete from comment where id = #{id}
+    </delete>
+
+    <delete id="deleteTCommentByIds" parameterType="String">
+        delete from comment where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                        <update id="logicDelByIds" parameterType="String">
+        update comment
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

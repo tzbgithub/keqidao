@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.salesman.sales.mapper.LinkOrganizationSalesmanMapper">
+    
+    <resultMap type="com.qidao.qidao.salesman.sales.domain.LinkOrganizationSalesman" id="LinkOrganizationSalesmanResult">
+        <result property="authorizedSalesman"    column="authorized_salesman"    />
+        <result property="authorizedImg"    column="authorized_img"    />
+        <result property="authoorized"    column="authoorized"    />
+        <result property="memberName"    column="member_name"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="organizationName"    column="organization_name"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="type"    column="type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="salesmanName"    column="salesman_name"    />
+        <result property="salesmanId"    column="salesman_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectLinkOrganizationSalesmanVo">
+        select authorized_salesman, authorized_img, authoorized, member_name, member_id, organization_name, del_flag, type, create_time, update_time, update_by, create_by, salesman_name, salesman_id, organization_id, id from link_organization_salesman
+    </sql>
+
+    <select id="selectLinkOrganizationSalesmanList" parameterType="com.qidao.qidao.salesman.sales.domain.LinkOrganizationSalesman" resultMap="LinkOrganizationSalesmanResult">
+        <include refid="selectLinkOrganizationSalesmanVo"/>
+        <where>  
+                <if test="authorizedSalesman != null "> and authorized_salesman = #{authorizedSalesman}</if>
+                <if test="authorizedImg != null  and authorizedImg != ''"> and authorized_img = #{authorizedImg}</if>
+                <if test="authoorized != null "> and authoorized = #{authoorized}</if>
+                <if test="memberName != null  and memberName != ''"> and member_name like concat('%', #{memberName}, '%')</if>
+                <if test="memberId != null "> and member_id = #{memberId}</if>
+                <if test="organizationName != null  and organizationName != ''"> and organization_name like concat('%', #{organizationName}, '%')</if>
+            AND del_flag = 0
+                    <if test="type != null "> and type = #{type}</if>
+                                <if test="salesmanName != null  and salesmanName != ''"> and salesman_name like concat('%', #{salesmanName}, '%')</if>
+                <if test="salesmanId != null "> and salesman_id = #{salesmanId}</if>
+                <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+            </where>
+    </select>
+    
+    <select id="selectLinkOrganizationSalesmanById" parameterType="Long" resultMap="LinkOrganizationSalesmanResult">
+        <include refid="selectLinkOrganizationSalesmanVo"/>
+        where id = #{id}
+                                  AND del_flag = 0
+                                            </select>
+        
+    <insert id="insertLinkOrganizationSalesman" parameterType="com.qidao.qidao.salesman.sales.domain.LinkOrganizationSalesman">
+        insert into link_organization_salesman
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="authorizedSalesman != null ">authorized_salesman,</if>
+            <if test="authorizedImg != null  and authorizedImg != ''">authorized_img,</if>
+            <if test="authoorized != null ">authoorized,</if>
+            <if test="memberName != null  and memberName != ''">member_name,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="organizationName != null  and organizationName != ''">organization_name,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="type != null ">type,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="salesmanName != null  and salesmanName != ''">salesman_name,</if>
+            <if test="salesmanId != null ">salesman_id,</if>
+            <if test="organizationId != null ">organization_id,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="authorizedSalesman != null ">#{authorizedSalesman},</if>
+            <if test="authorizedImg != null  and authorizedImg != ''">#{authorizedImg},</if>
+            <if test="authoorized != null ">#{authoorized},</if>
+            <if test="memberName != null  and memberName != ''">#{memberName},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="organizationName != null  and organizationName != ''">#{organizationName},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="salesmanName != null  and salesmanName != ''">#{salesmanName},</if>
+            <if test="salesmanId != null ">#{salesmanId},</if>
+            <if test="organizationId != null ">#{organizationId},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLinkOrganizationSalesman" parameterType="com.qidao.qidao.salesman.sales.domain.LinkOrganizationSalesman">
+        update link_organization_salesman
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="authorizedSalesman != null ">authorized_salesman = #{authorizedSalesman},</if>
+            <if test="authorizedImg != null  and authorizedImg != ''">authorized_img = #{authorizedImg},</if>
+            <if test="authoorized != null ">authoorized = #{authoorized},</if>
+            <if test="memberName != null  and memberName != ''">member_name = #{memberName},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="organizationName != null  and organizationName != ''">organization_name = #{organizationName},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="type != null ">type = #{type},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="salesmanName != null  and salesmanName != ''">salesman_name = #{salesmanName},</if>
+            <if test="salesmanId != null ">salesman_id = #{salesmanId},</if>
+            <if test="organizationId != null ">organization_id = #{organizationId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLinkOrganizationSalesmanById" parameterType="Long">
+        delete from link_organization_salesman where id = #{id}
+    </delete>
+
+    <delete id="deleteLinkOrganizationSalesmanByIds" parameterType="String">
+        delete from link_organization_salesman where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                    <update id="logicDelByIds" parameterType="String">
+        update link_organization_salesman
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                                        </mapper>

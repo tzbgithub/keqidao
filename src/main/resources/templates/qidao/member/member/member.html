@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('用户列表')"/>
+</head>
+<body class="gray-bg">
+<div class="row  border-bottom white-bg dashboard-header">
+    <div class="col-sm-2">
+        <button class="btn btn-primary btn-block ">
+            <div>昨日新增付费会员</div>
+            <div th:text="${yesterdayData}"></div>
+        </button>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-primary btn-block ">
+            <div>累计付费会员数量</div>
+            <div th:text="${allVip}"></div>
+        </button>
+    </div>
+
+    <div class="col-sm-2">
+        <button class="btn btn-primary btn-block ">
+            <div>累计订单金额</div>
+            <div th:text="${orderPrice}"></div>
+        </button>
+    </div>
+</div>
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <!--<p class="col-sm-10">手机号/id：</p>-->
+                            <input type="text" placeholder="手机号/id" name="code"/>
+                        </li>
+                        <li class="select-time">
+                            <p>时间：</p>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                        </li>
+                        <li>
+                            <p>角色：</p>
+                            <select name="type">
+                                <option value="">所有</option>
+                                <option value="0">实验室</option>
+                                <option value="1">企业</option>
+                            </select>
+                        </li>
+                        <li>
+                            <p>会员类型：</p>
+                            <select name="level">
+                                <option value="">所有</option>
+                                <option value="0">普通会员</option>
+                                <option value="1">付费会员</option>
+                                <option value="-1">冻结（封禁）</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="member:member:add">
+                <em class="fa fa-plus"></em> 设置/取消vip会员
+            </a>
+            <!--<a class="btn btn-success single disabled" onclick="toVerify()"
+               shiro:hasPermission="member:member:edit">
+                <em class="fa fa-edit"></em> 实验室入驻审核
+            </a>-->
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()"
+               shiro:hasPermission="member:member:logicRemove">
+                <em class="glyphicon glyphicon-trash"></em> 逻辑删除
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="member:member:remove">
+                <em class="glyphicon glyphicon-trash"></em> 删除
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="resetPassword()"
+               shiro:hasPermission="member:member:edit">
+                <i class="fa fa-address-card-o "></i> 重置密码
+            </a>
+            <!--<a class="btn btn-danger multiple disabled" onclick="disable()"
+               shiro:hasPermission="member:member:edit">
+                <i class="fa fa-remove "></i> 禁用
+            </a>-->
+            <!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="TMember:TMember:export">
+                <em class="fa fa-download"></em> 导出
+            </a>-->
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('member:member:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('member:member:remove')}]];
+    var prefix = ctx + "member/member";
+
+    $(function () {
+        var options = {
+            url: prefix + "/getList",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            logicRemoveUrl: prefix + "/logicRemove",
+            exportUrl: prefix + "/export",
+            modalName: "用户",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'id',
+                    title: '用户ID'
+                },
+                {
+                    field: 'name',
+                    title: '用户名'
+                },
+
+                {
+                    field: 'phone',
+                    title: '手机号'
+                },
+                {
+                    field: 'type',
+                    title: '角色',
+                    formatter: function (value , row ,index){
+                        switch (value){
+                            case 0: return '实验室';
+                            case 1: return '企业';
+                            default: return '-';
+                        }
+                    }
+                },
+                {
+                    field: 'createTime',
+                    title: '注册时间'
+                },
+                {
+                    field: 'startTime',
+                    title: '会员开通时间'
+                },
+                {
+                    field: 'endTime',
+                    title: '会员到期时间'
+                },
+                {
+                    field: 'price',
+                    title: '订单总额',
+                    formatter: function (value , row ,index){
+                        if (value == null){
+                            return '无订单';
+                        }
+                        return value;
+                    }
+                },
+                {
+                    field: 'level',
+                    title: '状态',
+                    formatter: function (value , row ,index){
+                        switch (value){
+                            case -1 : return '<span style="color: red">封禁</span>';
+                            default: return '<span style="color: green">正常</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'verifyStatus',
+                    title: '入驻实验室状态',
+                    formatter: function (value , row ,index){
+                        if (row.type === 0){
+                            if (value === 0){
+                                return '<span style="color: red">待审核</span>';
+                            }
+                            if (value === 1){
+                                return '<span style="color: red">未通过</span>';
+                            }
+                            if (value === 2){
+                                return '<span style="color: green">已入驻</span>';
+                            }
+                        }else{
+                            return '<span style="color: red">-</span>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.type === 0 && row.verifyStatus !== 2 ){
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="toVerify(\'' + row.id + '\')"><em class="glyphicon glyphicon-check"></em>审核</a> ');
+
+                        }
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="toDetails(\'' + row.id + '\')"><em class="fa fa-search"></em>查看</a> ');
+/*
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><em class="fa fa-remove"></em>删除</a>');
+*/
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    function resetPassword(){
+        var rows = $.table.selectIds();
+        if(rows.length === 0){
+            $.modal.alertWarning("请至少选择一条记录");
+            return;
+        }
+        $.modal.confirm("确认要重置选中的" + rows.length + `个用户的密码为<strong>"123456"</strong>吗?`, function() {
+            var data = { "id": rows.join() };
+            $.operate.submit(prefix+"/resetPassword", "put", "json", data);
+        });
+    }
+    function disable(){
+        var rows = $.table.selectIds();
+        if(rows.length === 0){
+            $.modal.alertWarning("请至少选择一条记录");
+            return;
+        }
+        $.modal.confirm("确认要禁用选中的" + rows.length + `个用户吗?`, function() {
+            var data = { "id": rows.join() };
+            $.operate.submit(prefix+"/disable", "put", "json", data);
+        });
+    }
+
+    function toDetails(id) {
+
+        $.modal.openOptions({
+            title: "用户详情",
+            url: prefix + "/toDetails/" + id,
+            yes: function (index, layero) {
+                var iframeWin = layero.find('iframe')[0];
+                iframeWin.contentWindow.submitHandler(index, layero);
+            },
+        });
+    }
+
+        function toVerify(id) {
+            /*var id = $.table.selectIds();
+            if(id.length !== 1) {
+                $.modal.alertWarning("请选择一条记录");
+                return ;
+            }*/
+            $.modal.openOptions({
+                url: prefix+"/verify/"+id,
+                title:"用户审核",
+                id: id,
+                btn: ['<em class="fa fa-check"></em> 审核通过', '<em class="fa fa-close"></em> 审核拒绝'],
+                yes: function ( index , layero) {
+                    var iframeWin = layero.find('iframe')[0];
+                    iframeWin.contentWindow.submitHandler(index, layero);
+                },
+                refuse: function (){
+                    var config = {
+                        url: prefix+"/verifyDeft/"+id+"/"+"审核未通过，如有疑问请联系运营人员",
+                        type: "put",
+                        dataType: "json",
+                        data: {},
+                        beforeSend: function () {
+                            $.modal.loading("正在处理中，请稍后...");
+                            $.modal.disable();
+                        },
+                        success: function(result) {
+                            $.modal.closeLoading();
+                            $.modal.close();
+                            $.modal.msgSuccess(result.msg);
+                            $.table.refresh();
+                        }
+                    };
+                    $.ajax(config)
+                }
+            });v
+        }
+        /*$.ajax({
+            url: prefix+"/toDetails/"+id,
+            data:{},
+            type: "get",
+            dataType: "json",
+            success:function (data){
+
+            }
+        })*/
+
+</script>
+</body>
+</html>

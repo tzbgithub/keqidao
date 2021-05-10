@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.salesman.salesman.mapper.SalesmanMapper">
+
+    <resultMap type="com.qidao.qidao.salesman.salesman.domain.Salesman" id="SalesmanResult">
+        <result property="unionId" column="union_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="headImage" column="head_image"/>
+        <result property="password" column="password"/>
+        <result property="phone" column="phone"/>
+        <result property="name" column="name"/>
+        <result property="no" column="no"/>
+        <result property="id" column="id"/>
+    </resultMap>
+
+    <sql id="selectSalesmanVo">
+        select union_id,
+               del_flag,
+               update_by,
+               update_time,
+               create_by,
+               create_time,
+               head_image,
+               password,
+               phone,
+               name, no, id
+        from salesman
+    </sql>
+
+    <select id="selectSalesmanList" parameterType="com.qidao.qidao.salesman.salesman.domain.Salesman"
+            resultMap="SalesmanResult">
+        <include refid="selectSalesmanVo"/>
+        <where>
+            <if test="unionId != null  and unionId != ''">and union_id = #{unionId}</if>
+            AND del_flag = 0
+            <if test="headImage != null  and headImage != ''">and head_image = #{headImage}</if>
+            <if test="password != null  and password != ''">and password = #{password}</if>
+            <if test="phone != null  and phone != ''">and phone = #{phone}</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="no != null  and no != ''">and no = #{no}</if>
+        </where>
+    </select>
+
+    <select id="selectSalesmanById" parameterType="Long" resultMap="SalesmanResult">
+        <include refid="selectSalesmanVo"/>
+        where id = #{id}
+        AND del_flag = 0
+    </select>
+
+    <insert id="insertSalesman" parameterType="com.qidao.qidao.salesman.salesman.domain.Salesman">
+        insert into salesman
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unionId != null  and unionId != ''">union_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="headImage != null  and headImage != ''">head_image,</if>
+            <if test="password != null  and password != ''">password,</if>
+            <if test="phone != null  and phone != ''">phone,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="no != null  and no != ''">no,</if>
+            <if test="id != null ">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="unionId != null  and unionId != ''">#{unionId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="headImage != null  and headImage != ''">#{headImage},</if>
+            <if test="password != null  and password != ''">#{password},</if>
+            <if test="phone != null  and phone != ''">#{phone},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="no != null  and no != ''">#{no},</if>
+            <if test="id != null ">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSalesman" parameterType="com.qidao.qidao.salesman.salesman.domain.Salesman">
+        update salesman
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="unionId != null  and unionId != ''">union_id = #{unionId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="headImage != null  and headImage != ''">head_image = #{headImage},</if>
+            <if test="password != null  and password != ''">password = #{password},</if>
+            <if test="phone != null  and phone != ''">phone = #{phone},</if>
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="no != null  and no != ''">no = #{no},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSalesmanById" parameterType="Long">
+        delete
+        from salesman
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteSalesmanByIds" parameterType="String">
+        delete from salesman where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="logicDelByIds" parameterType="String">
+        update salesman
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

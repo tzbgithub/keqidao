@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.channel.channel.mapper.TChannelMapper">
+    
+    <resultMap type="com.qidao.qidao.channel.channel.domain.TChannel" id="TChannelResult">
+        <result property="sequence"    column="sequence"    />
+        <result property="title"    column="title"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectTChannelVo">
+        select sequence, title, del_flag, update_by, create_by, update_time, create_time, id from channel
+    </sql>
+
+    <select id="selectTChannelList" parameterType="com.qidao.qidao.channel.channel.domain.TChannel" resultMap="TChannelResult">
+        <include refid="selectTChannelVo"/>
+        <where>  
+                <if test="sequence != null "> and sequence = #{sequence}</if>
+                <if test="title != null  and title != ''"> and title = #{title}</if>
+            AND del_flag = 0
+                                </where>
+    </select>
+    
+    <select id="selectTChannelById" parameterType="Long" resultMap="TChannelResult">
+        <include refid="selectTChannelVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTChannel" parameterType="com.qidao.qidao.channel.channel.domain.TChannel">
+        insert into channel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sequence != null ">sequence,</if>
+            <if test="title != null  and title != ''">title,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sequence != null ">#{sequence},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTChannel" parameterType="com.qidao.qidao.channel.channel.domain.TChannel">
+        update channel set sequence= #{sequence} where id = #{id}
+    </update>
+
+    <delete id="deleteTChannelById" parameterType="Long">
+        delete from channel where id = #{id}
+    </delete>
+
+    <delete id="deleteTChannelByIds" parameterType="String">
+        delete from channel where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                    <update id="logicDelByIds" parameterType="String">
+        update channel
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

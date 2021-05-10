@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('消息列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>标题：</p>
+                                <input type="text" name="title"/>
+                            </li>
+                            <li>
+                                <p>消息类型：</p>
+                                <select name="type">
+                                    <option value="">所有</option>
+                                    <option value="0">不推送</option>
+                                    <option value="1">立即推送</option>
+                                    <option value="2">每日推送</option>
+                                    <option value="3">定时发送</option>
+                                    <option value="4">触发类型：用户注册</option>
+                                    <option value="5">滚动消息：达成合作</option>
+                                    <option value="6">用户获取短信验证码</option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>状态：</p>
+                                <select name="status" >
+                                    <option value="">所有</option>
+                                    <option value="0">未发送</option>
+                                    <option value="1">已发送</option>
+                                    <option value="2">发送失败</option>
+                                    <option value="-1">无需此字段</option>
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>时间：</p>
+                                <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="msg:msg:add">
+                    <em class="fa fa-plus"></em> 添加
+                </a>
+                <!--<a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="msg:msg:edit">
+                    <em class="fa fa-edit"></em> 修改
+                </a>-->
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="msg:msg:logicRemove">
+                    <em class="fa fa-remove"></em> 逻辑删除
+                </a>
+               <!-- <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="msg:msg:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="msg:msg:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('msg:msg:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('msg:msg:remove')}]];
+        var prefix = ctx + "msg/msg";
+
+        $(function() {
+            var options = {
+                url: prefix + "/getList",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/toEdit/{id}",
+                removeUrl: prefix + "/remove",
+                logicRemoveUrl: prefix + "/logicRemove",
+                exportUrl: prefix + "/export",
+                modalName: "消息",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'content',
+                    title : '标题'
+                },
+                {
+                    field : 'menu',
+                    title : '菜单类型'
+                },
+                {
+                    field : 'createBy',
+                    title : '创建人'
+                },
+                {
+                    field : 'createTime',
+                    title : '创建时间'
+                },
+                {
+                    field : 'pushTime', 
+                    title : '发送时间'
+                },
+                {
+                    field : 'type',
+                    title : '消息类型',
+                    formatter : function (value, row, index){
+                        switch (value){
+                            case 0: return '<span style="color: #ff0000">不推送</span>';
+                            case 1: return '立即推送';
+                            case 2: return '每日推送';
+                            case 3: return '定时发送';
+                            case 4: return '触发类型：用户注册';
+                            case 5: return '滚动消息：达成合作';
+                            case 6: return '用户获取短信验证码';
+                        }
+                    }
+                },
+                {
+                    field : 'receiveType',
+                    title : '发送类型',
+                    formatter : function (value, row, index){
+                        switch (value){
+                            case 0: return '全平台发送';
+                            case 1: return '指定用户发送';
+                        }
+                    }
+                },
+                {
+                    field : 'status', 
+                    title : '状态',
+                    formatter : function (value , row , index){
+                        switch (value){
+                            case 0: return '未发送';
+                            case 1: return '已发送';
+                            case 2: return '发送失败';
+                            case -1: return '无需此字段';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        if (row.type != 0){
+                            actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="disable(\'' + row.id + '\')">禁用</a> ');
+                        }
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="toEdit(\'' + row.id + '\')">查看</a> ');
+/*
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><em class="fa fa-remove"></em>删除</a>');
+*/
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        function disable(id){
+            var config = {
+                url: prefix+"/disable/"+id,
+                type: "put",
+                dataType: "json",
+                data: {},
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                    $.modal.disable();
+                },
+                success: function(result) {
+                    $.modal.closeLoading();
+                    $.modal.close();
+                    $.modal.msgSuccess(result.msg);
+                    $.table.refresh();
+                }
+            };
+            $.ajax(config)
+        }
+
+
+        function toEdit(id){
+            $.modal.openOptions({
+                url: prefix+"/toEdit/"+id,
+                title:"查看消息",
+                btn: ['<em class="fa fa-check"></em> 撤销', '<em class="fa fa-close"></em> 关闭'],
+                yes: function ( index , layero) {
+                    var iframeWin = layero.find('iframe')[0];
+                    iframeWin.contentWindow.submitHandler(index, layero);
+                },
+                refuse: function (){
+                    var config = {
+                        url: prefix+"/revoke/"+id,
+                        type: "put",
+                        dataType: "json",
+                        data: {},
+                        beforeSend: function () {
+                            $.modal.loading("正在处理中，请稍后...");
+                            $.modal.disable();
+                        },
+                        success: function(result) {
+                            $.modal.closeLoading();
+                            $.modal.close();
+                            $.modal.msgSuccess(result.msg);
+                            $.table.refresh();
+                        }
+                    };
+                    $.ajax(config)
+                }
+            });
+        }
+
+        function formatterDateTimestamp (type, addTime) {
+            var dateObj = new Date();
+            var cTime = dateObj.getTime();
+            if(addTime){cTime += addTime;}
+            if(!type){type = 'number';}
+            if(type == 'number'){return cTime;}
+            return this.toDate(cTime / 1000, 'str');
+        }
+        // 时间戳转 YY-mm-dd HH:ii:ss
+        function toDate(timeStamp, returnType){
+            timeStamp = parseInt(timeStamp);
+            var date = new Date();
+            if(timeStamp < 90000000000 ){
+                date.setTime(timeStamp * 1000);
+            }else{
+                date.setTime(timeStamp );
+            }
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            second = second < 10 ? ('0' + second) : second;
+            if(returnType === 'str'){return y + '-' + m + '-' + d + ' '+ h +':' + minute + ':' + second;}
+            return [y, m, d, h, minute, second];
+        }
+    </script>
+</body>
+</html>

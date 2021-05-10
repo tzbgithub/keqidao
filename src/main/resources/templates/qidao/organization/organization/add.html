@@ -1,0 +1,394 @@
+ <!DOCTYPE html>
+                  <html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增实验室')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-organization-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">实验室名称：</label>
+            <div class="col-sm-8">
+                <input name="name"  maxlength="16"  id="name" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所属单位：</label>
+            <div class="col-sm-8">
+                <input name="belong"   maxlength="32" id="belong" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">可服务(赋能）行业：</label>
+            <div class="col-sm-8">
+                <!--改下拉-->
+                <select id="industry"  name="industry" class="form-control" >
+
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注：</label>
+            <div class="col-sm-8">
+                <input name="industryRemark" maxlength="64" id="industryRemark" placeholder="如可赋能行业不在列表中，请在此处手动添加" class="form-control" type="text">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">实验室简介：</label>
+            <div class="col-sm-8">
+                <textarea name="summary" id="summary" maxlength="64" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">科研人员姓名：</label>
+            <div class="col-sm-8">
+                <input name="memberName" maxlength="16"  id="memberName" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">科研人员科研方向：</label>
+            <div class="col-sm-8">
+                <input name="labels" id="labels" placeholder="最多输入五个，以“,” 隔开" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">科研人员学历：</label>
+            <div class="col-sm-8">
+                <!--改下拉-->
+                <select id="education"  name="education" class="form-control" >
+
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">科研人员职称：</label>
+            <div class="col-sm-8">
+                <!--改下拉-->
+                <select id="position" name="position" class="form-control" >
+
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">联系邮箱：</label>
+            <div class="col-sm-8">
+                <input name="email" id="email" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">联系电话：</label>
+            <div class="col-sm-8">
+                <input name="phone" id="phone" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">实验室规模：</label>
+            <div class="col-sm-8">
+                <select id="scale" name="scale" class="form-control" >
+
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">实验室地址：</label>
+            <div class="col-sm-8">
+                <select id="province" name="province" onchange="getCity()" class="form-control" >
+                    <option value="0">---请选择省---</option>
+                </select>
+                <select id="city" name="city" onchange="getArea()" class="form-control" >
+                    <option value="0">---请选择市---</option>
+                </select>
+                <select id="area" name="area" class="form-control" >
+                    <option value="0">---请选择区---</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">服务技术规模：</label>
+            <div class="col-sm-8">
+                <select id="techScale" name="techScale" class="form-control" >
+
+                </select>
+            </div>
+        </div>
+        <!--<div class="form-group">
+            <label class="col-sm-3 control-label">近三年科研经费总和：</label>
+            <div class="col-sm-8">
+                <input name="researchDirection" class="form-control" type="text" required>
+            </div>
+        </div>-->
+
+        <!--<div class="form-group">
+            <label class="col-sm-3 control-label">可提供的技术服务：</label><br>
+            <div class="col-sm-9" id="serverDiv">
+                &lt;!&ndash;复选框&ndash;&gt;
+            </div>
+        </div>-->
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">上传实验室铭牌或教师工牌：</label>
+            <div class="col-sm-8">
+                <th:block th:include="code :: upload_html(imgId='license')"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">证书/导师资格证图片：</label>
+            <div class="col-sm-8">
+                <th:block th:include="code :: upload_html(imgId='qualifications')"/>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<th:block th:include="code :: cos_img_js('license')"/>
+<th:block th:include="code :: cos_img_js('qualifications')"/>
+<script src="https://cdn.bootcss.com/moment.js/2.24.0/moment-with-locales.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript">
+    let c= 0;
+    let limit = 3;
+    var prefix = ctx + "organization/organization"
+    var configPrefix = ctx + "config/select/getConfigByType/"
+    var addressPrefix = ctx + "address"
+    $("#form-organization-add").validate({
+        focusCleanup: true
+    });
+    function getCity(){
+        let val = $("#province").val();
+        $.ajax({
+            url: addressPrefix+"/getCity/"+val,
+            data:{},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                console.log(data)
+                $("#city").empty();
+                $("#city").append("<option value='0'>---请选择市---</option>")
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#city").append("<option value='"+data[i].cityCode+"'>"+data[i].cityName+"</option>")
+                }
+            }
+        })
+    }
+    /*function doCheck(obj) {
+        let checked = obj.checked;
+        if (checked) {
+            c++
+        } else {
+            c--
+        }
+        if (c > limit) {
+            obj.checked = false;
+            $("input[name='server']").each(function () {
+                if (!this.checked) {
+                    $(this).attr("disabled", true);
+                }
+            });
+            c--;
+        }
+        if (c < limit) {
+            if (!obj.checked) {
+                $("input[name='server']").each(function () {
+                    $(this).attr("disabled", false);
+                });
+            }
+
+        }
+    }*/
+
+    function getArea(){
+        let val = $("#city").val();
+        $.ajax({
+            url: addressPrefix+"/getArea/"+val,
+            data:{},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#area").append("<option value='"+data[i].areaCode+"'>"+data[i].areaName+"</option>")
+                }
+            }
+        })
+    }
+
+    function submitHandler() {
+        /*let server =[];
+        $("input[name='server']:checked").each(function(){
+            server.push($(this).val());
+        });*/
+        if ($.validate.form()) {
+            var province = parseInt($("#province").val());
+            var city = parseInt($("#city").val());
+            var area = parseInt($("#area").val());
+            if (province === 0 || city === 0 || area === 0 ){
+                $.modal.msg("请填写完整的地址", modal_status.FAIL);
+                return;
+            }
+            let phoneCheck = Bee.PhoneUtils.isPhoneNum($("#phone").val());
+            if (!phoneCheck){
+                $.modal.msg("请填写正确的11位手机号", modal_status.FAIL);
+                return;
+            }
+            let val = $("#email").val();
+            var match = val.match(/^[-\w\+]+(?:\.[-\w]+)*@[-a-z0-9]+(?:\.[a-z0-9]+)*(?:\.[a-z]{2,})$/i);
+            if (!match){
+                $.modal.msg("请填写正确的邮箱格式", modal_status.FAIL);
+                return;
+            }
+            $.operate.save(prefix + "/createOrgan", {
+                type: 0,
+                name: $("#name").val(),
+                belong: $("#belong").val(),
+                industry: $("#industry").val(),
+                industryRemark: $("#industryRemark").val(),
+                summary: $("#summary").val(),
+                memberName: $("#memberName").val(),
+                labels: $("#labels").val(),
+                education: $("#education").val(),
+                position: $("#position").val(),
+                email: $("#email").val(),
+                phone: $("#phone").val(),
+                scale: $("#scale").val(),
+                province: $("#province").find("option:selected").text(),
+                provinceCode: $("#province").val(),
+                city: $("#city").find("option:selected").text(),
+                cityCode: $("#city").val(),
+                area: $("#area").find("option:selected").text(),
+                areaCode: $("#area").val(),
+                techScale: $("#techScale").val(),
+                license: $("#license").val()
+                //server: JSON.stringify(server),
+                //fundsId: $("#fundsId").val()
+            });
+        }
+    }
+    $(function () {
+
+        //省
+        $.ajax({
+            url: addressPrefix+"/getProvince",
+            data:{},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#province").append("<option value='"+data[i].provinceCode+"'>"+data[i].provinceName+"</option>")
+                }
+            }
+        })
+
+        //行业 6
+        $.ajax({
+            url: configPrefix+6,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                $("#industry").empty();
+                $("#industry").append("<option value=''>---请选择行业---</option>")
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#industry").append("<option value='"+data[i].id+"'>"+data[i].val+"</option>")
+                }
+            }
+        })
+
+        //学历 4
+        $.ajax({
+            url: configPrefix+4,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#education").append("<option value='"+data[i].id+"'>"+data[i].val+"</option>")
+                }
+            }
+        })
+        //职称 10
+        $.ajax({
+            url: configPrefix+10,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#position").append("<option value='"+data[i].id+"'>"+data[i].val+"</option>")
+                }
+            }
+        })
+        //实验室规模 1
+        $.ajax({
+            url: configPrefix+1,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#scale").append("<option value='"+data[i].id+"'>"+data[i].val+"</option>")
+                }
+            }
+        })
+        //服务技术规模 2
+        $.ajax({
+            url: configPrefix+2,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                console.log("techScale"+data)
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#techScale").append("<option value='"+data[i].id+"'>"+data[i].val+"</option>")
+                }
+            }
+        })
+        //可提供的技术服务 0
+        /*$.ajax({
+            url: configPrefix+0,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                for(let i = 0 ; i<data.length ; i++){
+                    let html = "<label class='col-sm-3  radio-inline'>\n" +
+                        "            <input type='checkbox' name='server' onclick='doCheck(this)' id='serverIds' value='"+data[i].id+"'> "+data[i].val+"\n" +
+                        "       </label>";
+                    $("#serverDiv").append(html)
+                }
+            }
+        })*/
+
+        /*$('#datetimepicker2').datetimepicker({
+
+            format: 'YYYY-MM-DD hh:mm',
+
+            locale: moment.locale('zh-cn')
+
+        });*/
+
+    });
+
+</script>
+</body>
+</html>

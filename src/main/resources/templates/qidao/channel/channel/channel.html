@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('频道列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+           <!-- <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>排序值(越大越前)：</p>
+                                <input type="text" name="sequence"/>
+                            </li>
+                            <li>
+                                <p>频道标题(频道名)：</p>
+                                <input type="text" name="title"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>-->
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="channel:channel:add">
+                    <em class="fa fa-plus"></em> 添加
+                </a>
+               <!-- <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="channel:channel:edit">
+                    <em class="fa fa-edit"></em> 修改
+                </a>-->
+                <!--<a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="channel:channel:logicRemove">
+                    <em class="fa fa-remove"></em> 下架
+                </a>-->
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="channel:channel:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>
+                <!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="channel:channel:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('channel:channel:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('channel:channel:remove')}]];
+        var prefix = ctx + "channel/channel";
+
+        $(function() {
+            var options = {
+                url: prefix + "/getList",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                logicRemoveUrl: prefix + "/logicRemove",
+                exportUrl: prefix + "/export",
+                modalName: "频道",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'title', 
+                    title : '频道标题(频道名)'
+                },
+                {
+                    field : 'createTime',
+                    title : '添加时间',
+                    formatter(value) {
+                        if(value==null){
+                            return '<span style="color: red;">-</span>'
+                        }
+                        return   formatterDateTimestamp(value)
+                    }
+                },
+                {
+                    field : 'creatorName',
+                    title : '创建人'
+                },
+                {
+                    field : 'sequence',
+                    title : '排序'
+                },
+                {
+                    field : 'reviserName',
+                    title : '最后操作人'
+                },
+                {
+                    field : 'delFlag',
+                    title : '状态',
+                    formatter: function (value, row, index){
+                        switch (value){
+                            case 0: return '已上架';
+                            case 1: return '已撤销';
+                        }
+                    }
+                },
+                {
+                    field : 'id', 
+                    title : '主键',
+                    visible: false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><em class="fa fa-edit"></em>编辑</a> ');
+                        if(row.delFlag === 0){
+                            actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="stockFromSale(\'' + row.id + '\')" style="margin: 13px;"><em class="fa fa-remove"></em>下架</a> ');
+                        }else{
+                            actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="shelves(\'' + row.id + '\')"style="margin-left: 11px;"><em></em>重新上架</a> ');
+                        }
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        //下架
+        function stockFromSale(id){
+            $.modal.confirm("确认要将该频道从app首页下架吗?", function() {
+                $.ajax({
+                    url: prefix+"/stockFromSale/"+id,
+                    data: {},
+                    type: "get",
+                    dataType: "json",
+                    success: function (data){
+                        $.table.refresh();
+                    }
+                })
+            })
+        }
+        //上架
+        function shelves(id){
+            $.modal.confirm("确认要上架该频道到app首页吗?", function() {
+                $.ajax({
+                    url: prefix+"/shelves/"+id,
+                    data: {},
+                    type: "get",
+                    dataType: "json",
+                    success: function (data){
+                        $.table.refresh();
+                    }
+                })
+            })
+        }
+        function formatterDateTimestamp (type, addTime) {
+            // var dateObj = new Date();
+            // var cTime = dateObj.getTime();
+            // if(addTime){cTime += addTime;}
+            if(addTime){type += addTime;}
+            if(!type){type = 'number';}
+            if(type == 'number'){return type;}
+            return this.toDate(type / 1000, 'str');
+        }
+        // 时间戳转 YY-mm-dd HH:ii:ss
+        function toDate(timeStamp, returnType){
+            timeStamp = parseInt(timeStamp);
+            var date = new Date();
+            if(timeStamp < 90000000000 ){
+                date.setTime(timeStamp * 1000);
+            }else{
+                date.setTime(timeStamp );
+            }
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            second = second < 10 ? ('0' + second) : second;
+            if(returnType == 'str'){return y + '-' + m + '-' + d + ' '+ h +':' + minute + ':' + second;}
+            return [y, m, d, h, minute, second];
+        }
+    </script>
+</body>
+</html>

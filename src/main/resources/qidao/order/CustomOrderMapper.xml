@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.order.order.mapper.CustomOrderMapper">
+
+    <resultMap type="com.qidao.qidao.order.order.domain.Order" id="TOrderResult">
+        <result property="quantity"    column="quantity"    />
+        <result property="orderPrice"    column="order_price"    />
+        <result property="payPrice"    column="pay_price"    />
+        <result property="payTime"    column="pay_time"    />
+        <result property="memberName"    column="name"    />
+        <result property="status"    column="status"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="productSkuId"    column="product_sku_id"    />
+        <result property="no"    column="no"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+        <result property="phone" column="phone"/>
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select pay_way, order_price, pay_price, pay_time, member_name, status, member_id, product_sku_id, no, del_flag, update_by, create_by, update_time, create_time, id from `order`
+    </sql>
+
+    <select id="selectOrderByMemberId" parameterType="string" resultMap="TOrderResult">
+        <include refid="selectOrderVo"></include>
+        <where>
+            member_id = #{member_id}
+            and id like concat('%', #{keyword}, '%')
+            and id not in(select order_id
+                            from invoice
+                            where del_flag = 0)
+            and del_flag = 0
+        </where>
+    </select>
+
+
+    <select id="selectTOrderList" parameterType="com.qidao.qidao.order.order.domain.OrderListReq" resultMap="TOrderResult">
+        select m.phone , o.order_price, o.pay_time, m.name, o.status, o.member_id,
+               o.no, o.update_by, o.create_by, o.update_time, o.create_time, o.id
+        from `order` o
+        left join `member` m on o.member_id = m.id and m.del_flag = 0
+        <where>
+            <if test="memberName != null  and memberName != ''"> and o.member_name like concat('%', #{memberName}, '%')</if>
+            <if test="status != null "> and o.status = #{status}</if>
+            <if test="startTime != '' and endTime != ''">
+                and o.create_time between #{startTime} and #{endTime}
+            </if>
+            <if test="startTime != '' and endTime == ''">
+                and o.create_time >= #{startTime}
+            </if>
+            <if test="endTime != '' and startTime == ''">
+                and o.create_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+            AND o.del_flag = 0
+        </where>
+order by o.create_time desc
+    </select>
+
+    <select id="selectTOrderById" parameterType="Long" resultType="com.qidao.qidao.order.order.domain.OrderDetails">
+        select p.name productName , m.`name` memberName , m.id memberId,m.belong,
+               org.type organizationType , o.quantity , o.id,o.status,o.pay_way payWay,
+               o.`no` , o.order_price orderPrice , o.pay_price payPrice ,
+               o.pay_time payTime ,o.vip_start_time vipStartTime ,o.vip_end_time vipEndTime
+        from `order` o
+                 left join `member` m on o.member_id = m.id and m.del_flag = 0
+                 left join `organization` org on m.organization_id = org.id and org.del_flag = 0
+                 left join `product_sku` p on o.product_sku_id = p.id
+        where o.id = #{id}
+          AND o.del_flag = 0
+    </select>
+    <select id="getYesterdayData" resultType="java.lang.Integer">
+        select COUNT(*)
+        FROM `order`
+        where create_time BETWEEN #{startTime} and #{endTime}
+    </select>
+    <select id="getAllData" resultType="java.lang.Integer">
+        select count(*)
+        from `order`
+    </select>
+
+    <insert id="insertTOrder" parameterType="com.qidao.qidao.order.order.domain.TOrder">
+        insert into `order`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="quantity != null ">quantity,</if>
+            <if test="orderPrice != null ">order_price,</if>
+            <if test="payPrice != null ">pay_price,</if>
+            <if test="payTime != null ">pay_time,</if>
+            <if test="memberName != null  and memberName != ''">member_name,</if>
+            <if test="status != null ">status,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="productSkuId != null ">product_sku_id,</if>
+            <if test="no != null ">no,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="quantity != null ">#{quantity},</if>
+            <if test="orderPrice != null ">#{orderPrice},</if>
+            <if test="payPrice != null ">#{payPrice},</if>
+            <if test="payTime != null ">#{payTime},</if>
+            <if test="memberName != null  and memberName != ''">#{memberName},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="productSkuId != null ">#{productSkuId},</if>
+            <if test="no != null ">#{no},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTOrder" parameterType="com.qidao.qidao.order.order.domain.TOrder">
+        update `order`
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="quantity != null ">quantity = #{quantity},</if>
+            <if test="orderPrice != null ">order_price = #{orderPrice},</if>
+            <if test="payPrice != null ">pay_price = #{payPrice},</if>
+            <if test="payTime != null ">pay_time = #{payTime},</if>
+            <if test="memberName != null  and memberName != ''">member_name = #{memberName},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="productSkuId != null ">product_sku_id = #{productSkuId},</if>
+            <if test="no != null ">no = #{no},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTOrderById" parameterType="Long">
+        delete from `order` where id = #{id}
+    </delete>
+
+    <delete id="deleteTOrderByIds" parameterType="String">
+        delete from `order` where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="logicDelByIds" parameterType="String">
+        update `order`
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.contract.contract.mapper.ContractMapper">
+    
+    <resultMap type="com.qidao.qidao.contract.contract.domain.Contract" id="ContractResult">
+        <result property="serverTitle"    column="server_title"    />
+        <result property="confirmTime"    column="confirm_time"    />
+        <result property="signAddressAreaName"    column="sign_address_area_name"    />
+        <result property="signAddressAreaId"    column="sign_address_area_id"    />
+        <result property="signAddressCityName"    column="sign_address_city_name"    />
+        <result property="signAddressCityId"    column="sign_address_city_id"    />
+        <result property="signAddressProvinceName"    column="sign_address_province_name"    />
+        <result property="signAddressProvinceId"    column="sign_address_province_id"    />
+        <result property="status"    column="status"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="beginTime"    column="begin_time"    />
+        <result property="signTime"    column="sign_time"    />
+        <result property="no"    column="no"    />
+        <result property="memberIdPartB"    column="member_id_part_b"    />
+        <result property="memberIdPartyA"    column="member_id_party_a"    />
+        <result property="organizationIdPartyB"    column="organization_id_party_b"    />
+        <result property="organizationIdPartyA"    column="organization_id_party_a"    />
+        <result property="serverId"    column="server_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectContractVo">
+        select server_title, confirm_time, sign_address_area_name, sign_address_area_id, sign_address_city_name, sign_address_city_id, sign_address_province_name, sign_address_province_id, status, end_time, begin_time, sign_time, no, member_id_part_b, member_id_party_a, organization_id_party_b, organization_id_party_a, server_id, del_flag, update_by, create_by, update_time, create_time, id from contract
+    </sql>
+
+    <select id="selectContractList" parameterType="com.qidao.qidao.contract.contract.domain.Contract" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        <where>  
+                <if test="serverTitle != null  and serverTitle != ''"> and server_title = #{serverTitle}</if>
+                <if test="confirmTime != null "> and confirm_time = #{confirmTime}</if>
+                <if test="signAddressAreaName != null  and signAddressAreaName != ''"> and sign_address_area_name like concat('%', #{signAddressAreaName}, '%')</if>
+                <if test="signAddressAreaId != null "> and sign_address_area_id = #{signAddressAreaId}</if>
+                <if test="signAddressCityName != null  and signAddressCityName != ''"> and sign_address_city_name like concat('%', #{signAddressCityName}, '%')</if>
+                <if test="signAddressCityId != null "> and sign_address_city_id = #{signAddressCityId}</if>
+                <if test="signAddressProvinceName != null  and signAddressProvinceName != ''"> and sign_address_province_name like concat('%', #{signAddressProvinceName}, '%')</if>
+                <if test="signAddressProvinceId != null "> and sign_address_province_id = #{signAddressProvinceId}</if>
+                <if test="status != null "> and status = #{status}</if>
+                <if test="endTime != null "> and end_time = #{endTime}</if>
+                <if test="beginTime != null "> and begin_time = #{beginTime}</if>
+                <if test="signTime != null "> and sign_time = #{signTime}</if>
+                <if test="no != null  and no != ''"> and no = #{no}</if>
+                <if test="memberIdPartB != null "> and member_id_part_b = #{memberIdPartB}</if>
+                <if test="memberIdPartyA != null "> and member_id_party_a = #{memberIdPartyA}</if>
+                <if test="organizationIdPartyB != null "> and organization_id_party_b = #{organizationIdPartyB}</if>
+                <if test="organizationIdPartyA != null "> and organization_id_party_a = #{organizationIdPartyA}</if>
+                <if test="serverId != null "> and server_id = #{serverId}</if>
+            AND del_flag = 0
+                                </where>
+    </select>
+    
+    <select id="selectContractById" parameterType="Long" resultMap="ContractResult">
+        <include refid="selectContractVo"/>
+        where id = #{id}
+                                                                                  AND del_flag = 0
+                            </select>
+        
+    <insert id="insertContract" parameterType="com.qidao.qidao.contract.contract.domain.Contract">
+        insert into contract
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="serverTitle != null  and serverTitle != ''">server_title,</if>
+            <if test="confirmTime != null ">confirm_time,</if>
+            <if test="signAddressAreaName != null  and signAddressAreaName != ''">sign_address_area_name,</if>
+            <if test="signAddressAreaId != null ">sign_address_area_id,</if>
+            <if test="signAddressCityName != null  and signAddressCityName != ''">sign_address_city_name,</if>
+            <if test="signAddressCityId != null ">sign_address_city_id,</if>
+            <if test="signAddressProvinceName != null  and signAddressProvinceName != ''">sign_address_province_name,</if>
+            <if test="signAddressProvinceId != null ">sign_address_province_id,</if>
+            <if test="status != null ">status,</if>
+            <if test="endTime != null ">end_time,</if>
+            <if test="beginTime != null ">begin_time,</if>
+            <if test="signTime != null ">sign_time,</if>
+            <if test="no != null  and no != ''">no,</if>
+            <if test="memberIdPartB != null ">member_id_part_b,</if>
+            <if test="memberIdPartyA != null ">member_id_party_a,</if>
+            <if test="organizationIdPartyB != null ">organization_id_party_b,</if>
+            <if test="organizationIdPartyA != null ">organization_id_party_a,</if>
+            <if test="serverId != null ">server_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="serverTitle != null  and serverTitle != ''">#{serverTitle},</if>
+            <if test="confirmTime != null ">#{confirmTime},</if>
+            <if test="signAddressAreaName != null  and signAddressAreaName != ''">#{signAddressAreaName},</if>
+            <if test="signAddressAreaId != null ">#{signAddressAreaId},</if>
+            <if test="signAddressCityName != null  and signAddressCityName != ''">#{signAddressCityName},</if>
+            <if test="signAddressCityId != null ">#{signAddressCityId},</if>
+            <if test="signAddressProvinceName != null  and signAddressProvinceName != ''">#{signAddressProvinceName},</if>
+            <if test="signAddressProvinceId != null ">#{signAddressProvinceId},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="endTime != null ">#{endTime},</if>
+            <if test="beginTime != null ">#{beginTime},</if>
+            <if test="signTime != null ">#{signTime},</if>
+            <if test="no != null  and no != ''">#{no},</if>
+            <if test="memberIdPartB != null ">#{memberIdPartB},</if>
+            <if test="memberIdPartyA != null ">#{memberIdPartyA},</if>
+            <if test="organizationIdPartyB != null ">#{organizationIdPartyB},</if>
+            <if test="organizationIdPartyA != null ">#{organizationIdPartyA},</if>
+            <if test="serverId != null ">#{serverId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateContract" parameterType="com.qidao.qidao.contract.contract.domain.Contract">
+        update contract
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="serverTitle != null  and serverTitle != ''">server_title = #{serverTitle},</if>
+            <if test="confirmTime != null ">confirm_time = #{confirmTime},</if>
+            <if test="signAddressAreaName != null  and signAddressAreaName != ''">sign_address_area_name = #{signAddressAreaName},</if>
+            <if test="signAddressAreaId != null ">sign_address_area_id = #{signAddressAreaId},</if>
+            <if test="signAddressCityName != null  and signAddressCityName != ''">sign_address_city_name = #{signAddressCityName},</if>
+            <if test="signAddressCityId != null ">sign_address_city_id = #{signAddressCityId},</if>
+            <if test="signAddressProvinceName != null  and signAddressProvinceName != ''">sign_address_province_name = #{signAddressProvinceName},</if>
+            <if test="signAddressProvinceId != null ">sign_address_province_id = #{signAddressProvinceId},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="endTime != null ">end_time = #{endTime},</if>
+            <if test="beginTime != null ">begin_time = #{beginTime},</if>
+            <if test="signTime != null ">sign_time = #{signTime},</if>
+            <if test="no != null  and no != ''">no = #{no},</if>
+            <if test="memberIdPartB != null ">member_id_part_b = #{memberIdPartB},</if>
+            <if test="memberIdPartyA != null ">member_id_party_a = #{memberIdPartyA},</if>
+            <if test="organizationIdPartyB != null ">organization_id_party_b = #{organizationIdPartyB},</if>
+            <if test="organizationIdPartyA != null ">organization_id_party_a = #{organizationIdPartyA},</if>
+            <if test="serverId != null ">server_id = #{serverId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteContractById" parameterType="Long">
+        delete from contract where id = #{id}
+    </delete>
+
+    <delete id="deleteContractByIds" parameterType="String">
+        delete from contract where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                                                                    <update id="logicDelByIds" parameterType="String">
+        update contract
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

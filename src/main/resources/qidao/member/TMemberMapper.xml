@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.member.member.mapper.TMemberMapper">
+
+    <resultMap type="com.qidao.qidao.member.member.domain.TMember" id="MemberResult">
+        <result property="email" column="email"/>
+        <result property="name" column="name"/>
+        <result property="industryId" column="industry_id"/>
+        <result property="vipEndTime" column="vip_end_time"/>
+        <result property="vipStartTime" column="vip_start_time"/>
+        <result property="backendImage" column="backend_image"/>
+        <result property="headImage" column="head_image"/>
+        <result property="password" column="password"/>
+        <result property="belong" column="belong"/>
+        <result property="pushStatus" column="push_status"/>
+        <result property="phone" column="phone"/>
+        <result property="educationId" column="education_id"/>
+        <result property="positionId" column="position_id"/>
+        <result property="role" column="role"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="level" column="level"/>
+        <result property="no" column="no"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="id" column="id"/>
+    </resultMap>
+
+    <sql id="selectMemberVo">
+        select email, name, industry_id, vip_end_time, vip_start_time, backend_image, head_image, password, belong, push_status, phone, education_id, position_id, role, organization_id, level, no, del_flag, update_by, create_by, update_time, create_time, id from member
+    </sql>
+
+    <select id="selectMemberList" parameterType="com.qidao.qidao.member.member.domain.TMember" resultMap="MemberResult">
+        <include refid="selectMemberVo"/>
+        <where>
+            <if test="email != null  and email != ''">and email = #{email}</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="industryId != null ">and industry_id = #{industryId}</if>
+            <if test="vipEndTime != null ">and vip_end_time = #{vipEndTime}</if>
+            <if test="vipStartTime != null ">and vip_start_time = #{vipStartTime}</if>
+            <if test="backendImage != null  and backendImage != ''">and backend_image = #{backendImage}</if>
+            <if test="headImage != null  and headImage != ''">and head_image = #{headImage}</if>
+            <if test="password != null  and password != ''">and password = #{password}</if>
+            <if test="belong != null  and belong != ''">and belong = #{belong}</if>
+            <if test="pushStatus != null ">and push_status = #{pushStatus}</if>
+            <if test="phone != null  and phone != ''">and phone = #{phone}</if>
+            <if test="educationId != null ">and education_id = #{educationId}</if>
+            <if test="positionId != null ">and position_id = #{positionId}</if>
+            <if test="role != null ">and role = #{role}</if>
+            <if test="organizationId != null ">and organization_id = #{organizationId}</if>
+            <if test="level != null ">and level = #{level}</if>
+            <if test="no != null  and no != ''">and no = #{no}</if>
+            AND del_flag = 0
+        </where>
+    </select>
+
+    <select id="selectMemberById" parameterType="String" resultMap="MemberResult">
+        <include refid="selectMemberVo"/>
+        where id = #{id}
+        AND del_flag = 0
+    </select>
+
+    <insert id="insertMember" parameterType="com.qidao.qidao.member.member.domain.TMember">
+        insert into member
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="email != null  and email != ''">email,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="industryId != null ">industry_id,</if>
+            <if test="vipEndTime != null ">vip_end_time,</if>
+            <if test="vipStartTime != null ">vip_start_time,</if>
+            <if test="backendImage != null  and backendImage != ''">backend_image,</if>
+            <if test="headImage != null  and headImage != ''">head_image,</if>
+            <if test="password != null  and password != ''">password,</if>
+            <if test="belong != null  and belong != ''">belong,</if>
+            <if test="pushStatus != null ">push_status,</if>
+            <if test="phone != null  and phone != ''">phone,</if>
+            <if test="educationId != null ">education_id,</if>
+            <if test="positionId != null ">position_id,</if>
+            <if test="role != null ">role,</if>
+            <if test="organizationId != null ">organization_id,</if>
+            <if test="level != null ">level,</if>
+            <if test="no != null  and no != ''">no,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null  and id != ''">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="email != null  and email != ''">#{email},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="industryId != null ">#{industryId},</if>
+            <if test="vipEndTime != null ">#{vipEndTime},</if>
+            <if test="vipStartTime != null ">#{vipStartTime},</if>
+            <if test="backendImage != null  and backendImage != ''">#{backendImage},</if>
+            <if test="headImage != null  and headImage != ''">#{headImage},</if>
+            <if test="password != null  and password != ''">#{password},</if>
+            <if test="belong != null  and belong != ''">#{belong},</if>
+            <if test="pushStatus != null ">#{pushStatus},</if>
+            <if test="phone != null  and phone != ''">#{phone},</if>
+            <if test="educationId != null ">#{educationId},</if>
+            <if test="positionId != null ">#{positionId},</if>
+            <if test="role != null ">#{role},</if>
+            <if test="organizationId != null ">#{organizationId},</if>
+            <if test="level != null ">#{level},</if>
+            <if test="no != null  and no != ''">#{no},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null  and id != ''">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMember" parameterType="com.qidao.qidao.member.member.domain.TMember">
+        update member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="email != null  and email != ''">email = #{email},</if>
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="industryId != null ">industry_id = #{industryId},</if>
+            <if test="vipEndTime != null ">vip_end_time = #{vipEndTime},</if>
+            <if test="vipStartTime != null ">vip_start_time = #{vipStartTime},</if>
+            <if test="backendImage != null  and backendImage != ''">backend_image = #{backendImage},</if>
+            <if test="headImage != null  and headImage != ''">head_image = #{headImage},</if>
+            <if test="password != null  and password != ''">password = #{password},</if>
+            <if test="belong != null  and belong != ''">belong = #{belong},</if>
+            <if test="pushStatus != null ">push_status = #{pushStatus},</if>
+            <if test="phone != null  and phone != ''">phone = #{phone},</if>
+            <if test="educationId != null ">education_id = #{educationId},</if>
+            <if test="positionId != null ">position_id = #{positionId},</if>
+            <if test="role != null ">role = #{role},</if>
+            <if test="organizationId != null ">organization_id = #{organizationId},</if>
+            <if test="level != null ">level = #{level},</if>
+            <if test="no != null  and no != ''">no = #{no},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMemberById" parameterType="String">
+        delete from member where id = #{id}
+    </delete>
+
+    <delete id="deleteMemberByIds" parameterType="String">
+        delete from member where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="logicDelByIds" parameterType="String">
+        update member
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

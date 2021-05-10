@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.canal.canal.mapper.TCanalMapper">
+
+    <resultMap type="com.qidao.qidao.canal.canal.domain.TCanal" id="TCanalResult">
+        <result property="downPath" column="down_path"/>
+        <result property="version" column="version"/>
+        <result property="name" column="name"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="id" column="id"/>
+    </resultMap>
+
+    <sql id="selectTCanalVo">
+        select down_path,
+               version,
+               name,
+               del_flag,
+               update_by,
+               create_by,
+               update_time,
+               create_time,
+               id
+        from canal
+    </sql>
+
+    <select id="selectTCanalList" parameterType="com.qidao.qidao.canal.canal.domain.TCanal" resultMap="TCanalResult">
+        <include refid="selectTCanalVo"/>
+        <where>
+            <if test="version != null  and version != ''">and version like concat('%',#{version},'%')</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            AND del_flag = 0
+        </where>
+    </select>
+
+    <select id="selectTCanalById" parameterType="Long" resultMap="TCanalResult">
+        <include refid="selectTCanalVo"/>
+        where id = #{id}
+        AND del_flag = 0
+    </select>
+
+    <insert id="insertTCanal" parameterType="com.qidao.qidao.canal.canal.domain.TCanal">
+        insert into canal
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="downPath != null  and downPath != ''">down_path,</if>
+            <if test="version != null  and version != ''">version,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="downPath != null  and downPath != ''">#{downPath},</if>
+            <if test="version != null  and version != ''">#{version},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTCanal" parameterType="com.qidao.qidao.canal.canal.domain.TCanal">
+        update canal
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="downPath != null  and downPath != ''">down_path = #{downPath},</if>
+            <if test="version != null  and version != ''">version = #{version},</if>
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTCanalById" parameterType="Long">
+        delete
+        from canal
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteTCanalByIds" parameterType="String">
+        delete from canal where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="logicDelByIds" parameterType="String">
+        update canal
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

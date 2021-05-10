@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.dynamic.mapper.TDynamicMapper">
+    <resultMap type="com.qidao.qidao.dynamic.domain.TDynamic" id="DynamicResult">
+        <result property="hot"    column="hot"    />
+        <result property="needVip"    column="need_vip"    />
+        <result property="img"    column="img"    />
+        <result property="verifyUserId"    column="verify_user_id"    />
+        <result property="verifyReason"    column="verify_reason"    />
+        <result property="verifyStatus"    column="verify_status"    />
+        <result property="likeNum"    column="like_num"    />
+        <result property="summary"    column="summary"    />
+        <result property="commentNum"    column="comment_num"    />
+        <result property="thumb"    column="thumb"    />
+        <result property="video"    column="video"    />
+        <result property="url"    column="url"    />
+        <result property="content"    column="content"    />
+        <result property="title"    column="title"    />
+        <result property="publishTime"    column="publish_time"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectDynamicVo">
+        select hot, need_vip, img, verify_user_id, verify_reason, verify_status, like_num, summary, comment_num, thumb, video, url, content, title, publish_time, member_id, del_flag, update_by, create_by, update_time, create_time, id from dynamic
+    </sql>
+
+    <select id="selectDynamicList" parameterType="com.qidao.qidao.dynamic.domain.Dynamic" resultMap="DynamicResult">
+        <include refid="selectDynamicVo"/>
+        <where>  
+                <if test="hot != null "> and hot = #{hot}</if>
+                <if test="needVip != null "> and need_vip = #{needVip}</if>
+                <if test="img != null  and img != ''"> and img = #{img}</if>
+                <if test="verifyUserId != null "> and verify_user_id = #{verifyUserId}</if>
+                <if test="verifyReason != null  and verifyReason != ''"> and verify_reason = #{verifyReason}</if>
+                <if test="verifyStatus != null "> and verify_status = #{verifyStatus}</if>
+                <if test="likeNum != null "> and like_num = #{likeNum}</if>
+                <if test="summary != null  and summary != ''"> and summary = #{summary}</if>
+                <if test="commentNum != null "> and comment_num = #{commentNum}</if>
+                <if test="thumb != null  and thumb != ''"> and thumb = #{thumb}</if>
+                <if test="video != null  and video != ''"> and video = #{video}</if>
+                <if test="url != null  and url != ''"> and url = #{url}</if>
+                <if test="content != null  and content != ''"> and content = #{content}</if>
+                <if test="title != null  and title != ''"> and title = #{title}</if>
+                <if test="publishTime != null "> and publish_time = #{publishTime}</if>
+                <if test="memberId != null "> and member_id = #{memberId}</if>
+            AND del_flag = 0
+                                </where>
+    </select>
+    
+    <select id="selectDynamicById" parameterType="Long" resultMap="DynamicResult">
+        <include refid="selectDynamicVo"/>
+        where id = #{id}
+                                                                          AND del_flag = 0
+                            </select>
+        
+    <insert id="insertDynamic" parameterType="com.qidao.qidao.dynamic.domain.Dynamic">
+        insert into dynamic
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="hot != null ">hot,</if>
+            <if test="needVip != null ">need_vip,</if>
+            <if test="img != null  and img != ''">img,</if>
+            <if test="verifyUserId != null ">verify_user_id,</if>
+            <if test="verifyReason != null  and verifyReason != ''">verify_reason,</if>
+            <if test="verifyStatus != null ">verify_status,</if>
+            <if test="likeNum != null ">like_num,</if>
+            <if test="summary != null  and summary != ''">summary,</if>
+            <if test="commentNum != null ">comment_num,</if>
+            <if test="thumb != null  and thumb != ''">thumb,</if>
+            <if test="video != null  and video != ''">video,</if>
+            <if test="url != null  and url != ''">url,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="title != null  and title != ''">title,</if>
+            <if test="publishTime != null ">publish_time,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="hot != null ">#{hot},</if>
+            <if test="needVip != null ">#{needVip},</if>
+            <if test="img != null  and img != ''">#{img},</if>
+            <if test="verifyUserId != null ">#{verifyUserId},</if>
+            <if test="verifyReason != null  and verifyReason != ''">#{verifyReason},</if>
+            <if test="verifyStatus != null ">#{verifyStatus},</if>
+            <if test="likeNum != null ">#{likeNum},</if>
+            <if test="summary != null  and summary != ''">#{summary},</if>
+            <if test="commentNum != null ">#{commentNum},</if>
+            <if test="thumb != null  and thumb != ''">#{thumb},</if>
+            <if test="video != null  and video != ''">#{video},</if>
+            <if test="url != null  and url != ''">#{url},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="publishTime != null ">#{publishTime},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDynamic" parameterType="com.qidao.qidao.dynamic.domain.Dynamic">
+        update dynamic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="hot != null ">hot = #{hot},</if>
+            <if test="needVip != null ">need_vip = #{needVip},</if>
+            <if test="img != null  and img != ''">img = #{img},</if>
+            <if test="verifyUserId != null ">verify_user_id = #{verifyUserId},</if>
+            <if test="verifyReason != null  and verifyReason != ''">verify_reason = #{verifyReason},</if>
+            <if test="verifyStatus != null ">verify_status = #{verifyStatus},</if>
+            <if test="likeNum != null ">like_num = #{likeNum},</if>
+            <if test="summary != null  and summary != ''">summary = #{summary},</if>
+            <if test="commentNum != null ">comment_num = #{commentNum},</if>
+            <if test="thumb != null  and thumb != ''">thumb = #{thumb},</if>
+            <if test="video != null  and video != ''">video = #{video},</if>
+            <if test="url != null  and url != ''">url = #{url},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="publishTime != null ">publish_time = #{publishTime},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDynamicById" parameterType="Long">
+        delete from dynamic where id = #{id}
+    </delete>
+
+    <delete id="deleteDynamicByIds" parameterType="String">
+        delete from dynamic where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                                                            <update id="logicDelByIds" parameterType="String">
+        update dynamic
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

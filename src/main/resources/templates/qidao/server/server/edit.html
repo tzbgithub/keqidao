@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改服务(需求)')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-server-edit" th:object="${tServer}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">期望解决时间：</label>
+                <div class="col-sm-8">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><em class="fa fa-calendar"></em></span>
+                        <input name="solutionTime" th:value="${#dates.format(tServer.solutionTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">图片或视频地址：</label>
+                <div class="col-sm-8">
+                    <input name="url" th:field="*{url}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">缩略图：</label>
+                <div class="col-sm-8">
+                    <input name="thumb" th:field="*{thumb}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">需求描述：</label>
+                <div class="col-sm-8">
+                    <textarea name="description" class="form-control" required>[[*{description}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">研究经费id 关联select_config：</label>
+                <div class="col-sm-8">
+                    <input name="specAmountId" th:field="*{specAmountId}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">需求领域id 关联select_config：</label>
+                <div class="col-sm-8">
+                    <input name="specAreaId" th:field="*{specAreaId}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">地址区名称：</label>
+                <div class="col-sm-8">
+                    <input name="addressAreaName" th:field="*{addressAreaName}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">地址区ID：</label>
+                <div class="col-sm-8">
+                    <input name="addressAreaId" th:field="*{addressAreaId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">地址市名称：</label>
+                <div class="col-sm-8">
+                    <input name="addressCityName" th:field="*{addressCityName}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">地址市id：</label>
+                <div class="col-sm-8">
+                    <input name="addressCityId" th:field="*{addressCityId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">地址省名称：</label>
+                <div class="col-sm-8">
+                    <input name="addressProvinceName" th:field="*{addressProvinceName}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">地址省ID：</label>
+                <div class="col-sm-8">
+                    <input name="addressProvinceId" th:field="*{addressProvinceId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">标题名称：</label>
+                <div class="col-sm-8">
+                    <input name="title" th:field="*{title}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">状态类别：0-草稿；1-已发布；2-已接受；3-已取消：</label>
+                <div class="col-sm-8">
+                    <select name="status" class="form-control m-b">
+                        <option value="">所有</option>
+                    </select>
+                    <span class="help-block m-b-none"><em class="fa fa-info-circle"></em> 代码生成请选择字典属性</span>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">null：</label>
+                <div class="col-sm-8">
+                    <input name="memberIdPartyB" th:field="*{memberIdPartyB}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">甲方：</label>
+                <div class="col-sm-8">
+                    <input name="memberIdPartyA" th:field="*{memberIdPartyA}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">null：</label>
+                <div class="col-sm-8">
+                    <input name="organizedIdPartyB" th:field="*{organizedIdPartyB}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">甲方：</label>
+                <div class="col-sm-8">
+                    <input name="organizedIdPartyA" th:field="*{organizedIdPartyA}" class="form-control" type="text" required>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "server/server";
+        $("#form-server-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-server-edit').serialize());
+            }
+        }
+
+        $("input[name='solutionTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+    </script>
+</body>
+</html>

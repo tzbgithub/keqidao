@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('合同列表')" />
+</head>
+<body class="gray-bg">
+    <div class="row  border-bottom white-bg dashboard-header">
+        <div class="col-sm-2">
+            <button class="btn btn-primary btn-block ">
+                <div>已签订合同总数</div>
+                <div th:text="${all}"></div>
+            </button>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary btn-block ">
+                <div>昨日签订合同数</div>
+                <div th:text="${yesterdayData}"></div>
+            </button>
+        </div>
+
+        <div class="col-sm-2">
+            <button class="btn btn-primary btn-block ">
+                <div>合同总金额</div>
+                <div th:text="${allMoney}"></div>
+            </button>
+        </div>
+    </div>
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>合同名称：</p>
+                                <input placeholder="请输入合同名称查询" type="text" name="serverTitle"/>
+                            </li>
+                            <li class="select-time">
+                                <p>开始时间：</p>
+                                <input type="text" class="time-input" id="signTime" placeholder="开始时间" name="signTime"/>
+                            </li>
+                            <li class="select-time">
+                                <p>结束时间：</p>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+<!--                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="contract:contract:add">-->
+<!--                    <em class="fa fa-plus"></em> 添加-->
+<!--                </a>-->
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="contract:contract:edit">-->
+<!--                    <em class="fa fa-edit"></em> 修改-->
+<!--                </a>-->
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="contract:contract:logicRemove">
+                    <em class="fa fa-remove"></em> 逻辑删除
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="contract:contract:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="contract:contract:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('contract:contract:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('contract:contract:remove')}]];
+        var prefix = ctx + "contract/contract";
+
+        $(function() {
+            var options = {
+                url: prefix + "/getList",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                logicRemoveUrl: prefix + "/logicRemove",
+                exportUrl: prefix + "/export",
+                modalName: "合同",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'noNumber',
+                    title : '合同编号'
+                },
+                {
+                    field : 'serverTitle', 
+                    title : '合同名称'
+                },
+                // {
+                //     field : 'status',
+                //     title : '合同状态'
+                // },
+                {
+                    field : 'memberNamePartyA',
+                    title : '需求方'
+                },
+                {
+                    field : 'memberNamePartB',
+                    title : '承接方'
+                },
+                {
+                    field : 'signTime',
+                    title : '签订时间'
+                },
+                {
+                    field : 'endTime',
+                    title : '合同到期时间'
+                },
+                {
+                    field : 'id',
+                    title : '主键',
+                    visible :false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><em class="fa fa-edit"></em>查看</a> ');
+                        actions.push('<a class="btn btn-warning btn-xs ' + editFlag + '" href="javascript:void(0)" onclick=""><em class="fa fa-remove"></em>导出</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

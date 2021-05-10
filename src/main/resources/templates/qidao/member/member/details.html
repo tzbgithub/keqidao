@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('用户详情')" />
+    <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-TMember-edit" th:object="${member}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">名称：</label>
+                <div class="col-sm-8">
+                    <input name="name" th:field="*{name}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">注册手机号：</label>
+                <div class="col-sm-8">
+                    <input name="phone" th:field="*{phone}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">邮箱：</label>
+                <div class="col-sm-8">
+                    <input name="email" th:field="*{email}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">学历：</label>
+                <div class="col-sm-8">
+                        <input name="education" th:field="*{education}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group" th:if="*{organization} ne null and *{organization} ne ''">
+                <label class="col-sm-3 control-label">实验室名称：</label>
+                <div class="col-sm-8">
+                        <input name="organization" th:field="*{organization}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">行业：</label>
+                <div class="col-sm-8">
+                    <input name="industry" th:field="*{industry}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">单位：</label>
+                <div class="col-sm-8">
+                    <input name="belong" th:field="*{belong}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">职位：</label>
+                <div class="col-sm-8">
+                    <input name="position" th:field="*{position}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">科研方向：</label>
+                <div class="col-sm-8">
+                    <input name="labels" th:field="*{labels}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <!--<div class="form-group" th:if="*{organization} ne null and *{organization} ne ''">
+                <label class="col-sm-3 control-label">可提供的技术服务：</label>
+                <div class="col-sm-8">
+                    <input name="dict" th:field="*{dict}" class="form-control" type="text" readonly>
+                </div>
+            </div>-->
+            <div class="form-group" th:if="*{organization} ne null and *{organization} ne ''">
+                <label class="col-sm-3 control-label">实验室规模：</label>
+                <div class="col-sm-8">
+                    <input name="scale" th:field="*{scale}" class="form-control" type="text"  readonly>
+                </div>
+            </div>
+            <div class="form-group" th:if="*{organization} ne null and *{organization} ne ''">
+                <label class="col-sm-3 control-label">技术服务规模：</label>
+                <div class="col-sm-8">
+                    <input name="techScale" th:field="*{techScale}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group" th:if="*{organization} ne null and *{organization} ne ''">
+                <label class="col-sm-3 control-label">地址：</label>
+                <div class="col-sm-8">
+                    <input name="address" th:field="*{address}" class="form-control" type="text" readonly>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">头像：</label>
+                <div class="col-sm-8">
+                    <th:block th:include="code :: upload_html(imgId='headImg' ,showVal=*{headImg})" readonly />
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+    <th:block th:include="code :: cos_img_js('headImg')"/>
+    <script type="text/javascript">
+        var prefix = ctx + "member/member";
+        $("#form-TMember-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            $.modal.close();
+            $.table.refresh();
+        }
+    </script>
+</body>
+</html>

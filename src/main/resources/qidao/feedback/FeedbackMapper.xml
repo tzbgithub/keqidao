@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.feedback.feedback.mapper.FeedbackMapper">
+
+    <resultMap type="com.qidao.qidao.feedback.feedback.domain.Feedback" id="FeedbackResult">
+        <result property="replyUserName" column="reply_user_name"/>
+        <result property="replyUserId" column="reply_user_id"/>
+        <result property="level" column="level"/>
+        <result property="memberId" column="member_id"/>
+        <result property="status" column="status"/>
+        <result property="reply" column="reply"/>
+        <result property="description" column="description"/>
+        <result property="reasonId" column="reason_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="id" column="id"/>
+    </resultMap>
+
+    <sql id="selectFeedbackVo">
+        select reply_user_name, reply_user_id, level, member_id, status, reply, description, reason_id, del_flag, update_by, create_by, update_time, create_time, id from feedback
+    </sql>
+
+    <select id="selectFeedbackList" parameterType="com.qidao.qidao.feedback.feedback.domain.Feedback"
+            resultMap="FeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        <where>
+            <if test="replyUserName != null  and replyUserName != ''">and reply_user_name like concat('%',
+                #{replyUserName}, '%')
+            </if>
+            <if test="replyUserId != null ">and reply_user_id = #{replyUserId}</if>
+            <if test="level != null ">and level = #{level}</if>
+            <if test="memberId != null ">and member_id = #{memberId}</if>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="reply != null  and reply != ''">and reply = #{reply}</if>
+            <if test="description != null  and description != ''">and description = #{description}</if>
+            <if test="reasonId != null ">and reason_id = #{reasonId}</if>
+            AND del_flag = 0
+        </where>
+    </select>
+
+    <select id="selectFeedbackById" parameterType="Long" resultMap="FeedbackResult">
+        <include refid="selectFeedbackVo"/>
+        where id = #{id}
+        AND del_flag = 0
+    </select>
+
+    <insert id="insertFeedback" parameterType="com.qidao.qidao.feedback.feedback.domain.Feedback">
+        insert into feedback
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="replyUserName != null  and replyUserName != ''">reply_user_name,</if>
+            <if test="replyUserId != null ">reply_user_id,</if>
+            <if test="level != null ">level,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="status != null ">status,</if>
+            <if test="reply != null  and reply != ''">reply,</if>
+            <if test="description != null  and description != ''">description,</if>
+            <if test="reasonId != null ">reason_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="replyUserName != null  and replyUserName != ''">#{replyUserName},</if>
+            <if test="replyUserId != null ">#{replyUserId},</if>
+            <if test="level != null ">#{level},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="reply != null  and reply != ''">#{reply},</if>
+            <if test="description != null  and description != ''">#{description},</if>
+            <if test="reasonId != null ">#{reasonId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFeedback" parameterType="com.qidao.qidao.feedback.feedback.domain.Feedback">
+        update feedback
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="replyUserName != null  and replyUserName != ''">reply_user_name = #{replyUserName},</if>
+            <if test="replyUserId != null ">reply_user_id = #{replyUserId},</if>
+            <if test="level != null ">level = #{level},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="reply != null  and reply != ''">reply = #{reply},</if>
+            <if test="description != null  and description != ''">description = #{description},</if>
+            <if test="reasonId != null ">reason_id = #{reasonId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFeedbackById" parameterType="Long">
+        delete from feedback where id = #{id}
+    </delete>
+
+    <delete id="deleteFeedbackByIds" parameterType="String">
+        delete from feedback where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="logicDelByIds" parameterType="String">
+        update feedback
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

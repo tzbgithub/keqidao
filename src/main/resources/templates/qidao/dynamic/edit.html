@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('审核动态')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-dynamic-edit" th:object="${dynamic}">
+        <input name="id" id="dynamicId" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">标题：</label>
+            <div class="col-sm-8">
+                <input name="img" th:field="*{title}" class="form-control" type="text" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">作者：</label>
+            <div class="col-sm-8">
+                <input name="verifyUserId" th:field="*{memberName}" class="form-control" type="text" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">发布时间：</label>
+            <div class="col-sm-8">
+                <input name="verifyReason" th:field="*{publishTime}" class="form-control" type="text" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">来源渠道：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" name="qudao" value="" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态：</label>
+            <div class="col-sm-8" th:switch="*{verifyStatus}">
+                <input name="" th:case="0" class="form-control" type="text" value="待审核" readonly>
+                <input name="" th:case="1" class="form-control" type="text" value="审核通过，待核准" readonly>
+                <input name="" th:case="2" class="form-control" type="text" value="审核拒绝" readonly>
+                <input name="" th:case="3" class="form-control" type="text" value="已上架" readonly>
+                <input name="" th:case="4" class="form-control" type="text" value="核准拒绝" readonly>
+            </div>
+        </div>
+        <div class="form-group" th:if="*{content} ne null and *{content} ne ''">
+            <label class="col-sm-3 control-label">动态正文：</label>
+            <div class="col-sm-8">
+                <textarea name="content" class="form-control" th:field="*{content}" rows="3" readonly></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">频道：</label>
+            <div class="col-sm-8" id="channelDiv">
+
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="col-sm-3"></span>
+            <div class="col-sm-4" th:switch="*{verifyStatus}">
+                <button class="btn btn-primary" th:case="0" onclick="verifyPass()" type="button" style="width:100px;height:40px">审核通过</button>
+                <button class="btn btn-primary" th:case="1" onclick="approvalPass()" type="button" style="width:100px;height:40px">上架</button>
+                <button class="btn btn-primary" th:case="2" onclick="verifyPass()" type="button" style="width:100px;height:40px">审核通过</button>
+                <button class="btn btn-primary" th:case="3" onclick="revoke()" type="button" style="width:100px;height:40px">撤销</button>
+            </div>
+            <div class="col-sm-4" th:switch="*{verifyStatus}">
+                <button class="btn btn-default" th:case="0" onclick="verifyFail()" type="button" style="width:100px;height:40px">撤销</button>
+                <button class="btn btn-default" th:case="1" onclick="approvalFail()" type="button" style="width:100px;height:40px">撤销</button>
+                <button class="btn btn-default" th:case="2" onclick="verifyFail()" type="button" style="width:100px;height:40px">撤销</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<script type="text/javascript" th:inline="javascript">
+    var prefix = ctx + "dynamic";
+    $("#form-dynamic-edit").validate({
+        focusCleanup: true
+    });
+
+    //已上架撤销
+    function revoke(){
+        var dynamicId = $("#dynamicId").val();
+        $.ajax({
+            url: prefix+"/revoke/"+dynamicId,
+            data:{},
+            type:"put",
+            dataType:"json",
+            success:function (data) {
+            }
+        })
+    }
+
+    //审核撤销
+    function verifyFail(){
+        var dynamicId = $("#dynamicId").val();
+        $.ajax({
+            url: prefix+"/verifyDynamicFailed/"+dynamicId,
+            data:{},
+            type:"put",
+            dataType:"json",
+            success:function (data) {
+            }
+        })
+    }
+
+    //核准撤销按钮方法
+    function approvalFail(){
+        var dynamicId = $("#dynamicId").val();
+        $.ajax({
+            url: prefix+"/approvalDynamicFailed/"+dynamicId,
+            data:{},
+            type:"put",
+            dataType:"json",
+            success:function (data) {
+            }
+        })
+    }
+
+    /**
+     * 上架按钮方法
+     */
+    function approvalPass(){
+        var dynamicId = $("#dynamicId").val();
+        var chk_value =[];
+        $("input[type='checkbox']:checked").each(function(){
+            chk_value.push($(this).val());
+        });
+        $.ajax({
+            url: prefix+"/approvalDynamicPass",
+            data:{
+                id: dynamicId,
+                channels: JSON.stringify(chk_value)
+            },
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+            }
+        })
+    }
+
+    /**
+     * 审核通过按钮方法
+     */
+    function verifyPass(){
+        var dynamicId = $("#dynamicId").val();
+        var chk_value =[];
+        $("input[type='checkbox']:checked").each(function(){
+            chk_value.push($(this).val());
+        });
+        $.ajax({
+            url: prefix+"/verifyDynamicPass",
+            data:{
+                id: dynamicId,
+                channels: JSON.stringify(chk_value)
+            },
+            type:"post",
+            dataType:"json",
+            success:function (data) {
+            }
+        })
+    }
+
+
+    $(function (){
+        $.ajax({
+            url: prefix+"/getChannel",
+            data:{},
+            type:"get",
+            dataType:"json",
+            success:function (data) {
+                for (let i=0;i<data.length;i++){
+                    let html = "<label class='radio-inline'>\n" +
+                        "            <input type='checkbox' name='channel' id='inlineRadio3' value='"+data[i].channelId+"' readonly> "+data[i].title+"\n" +
+                        "       </label>"
+                    $("#channelDiv").append(html)
+                }
+                var channel= [[${dynamic.channel}]];
+                var input = $("input[type='checkbox']");
+                for (let i = 0 ; i<input.length ; i++){
+                    for (let j = 0 ; j < channel.length ; j++){
+                        var value = input[i].value;
+                        var channelId = channel[j];
+                        if (value == channelId){
+                            input[i].checked=true
+                        }
+                    }
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>

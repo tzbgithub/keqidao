@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('详情查看')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-contract-edit" th:object="${contract}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">合同编号：</label>
+            <div class="col-sm-8">
+                <input name="no" th:field="*{noNumber}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">合同名称：</label>
+            <div class="col-sm-8">
+                <input name="serverTitle" th:field="*{serverTitle}" class="form-control" type="text" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">需求方：</label>
+            <div class="col-sm-8">
+                <input name="memberIdPartyA" th:field="*{memberNamePartyA}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">承接方：</label>
+            <div class="col-sm-8">
+                <input name="memberIdPartB" th:field="*{memberNamePartB}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">需求方组织名称：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{OrganizationNamePartA}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">成解方组织名称：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{OrganizationNamePartB}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">签订时间：</label>
+            <div class="col-sm-8">
+                <input name="signTime" th:field="*{signTime}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">合同状态：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:if="*{status} == 0" class="form-control" value="草稿" required readonly>
+                <input name="endTime" th:if="*{status} == 1" class="form-control" value="已确定合同" required readonly>
+                <input name="endTime" th:if="*{status} == 2" class="form-control" value="已签订合同" required readonly>
+                <input name="endTime" th:if="*{status} == 3" class="form-control" value="进度已完成" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">合同开始时间：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{beginTime}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">合同到期时间：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{endTime}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">合同确认时间：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{confirmTime}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所在省：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{signAddressProvinceName}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所在市：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{signAddressCityName}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所在区：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{signAddressAreaName}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">创建时间：</label>
+            <div class="col-sm-8">
+                <input name="endTime" th:field="*{createTime}" class="form-control" type="text" required readonly>
+            </div>
+        </div>
+
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<script type="text/javascript">
+    var prefix = ctx + "contract/contract";
+    $("#form-contract-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        $.modal.close();
+        $.table.refresh();
+    }
+
+</script>
+</body>
+</html>

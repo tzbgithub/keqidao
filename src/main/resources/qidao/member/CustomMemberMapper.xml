@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.member.member.mapper.CustomMemberMapper">
+
+    <resultMap type="com.qidao.qidao.member.member.domain.TMember" id="MemberResult">
+
+        <result property="email"    column="email"    />
+        <result property="name"    column="name"    />
+        <result property="industryId"    column="industry_id"    />
+        <result property="vipEndTime"    column="vip_end_time"    />
+        <result property="vipStartTime"    column="vip_start_time"    />
+        <result property="backendImage"    column="backend_image"    />
+        <result property="headImage"    column="head_image"    />
+        <result property="password"    column="password"    />
+        <result property="belong"    column="belong"    />
+        <result property="pushStatus"    column="push_status"    />
+        <result property="phone"    column="phone"    />
+        <result property="educationId"    column="education_id"    />
+        <result property="positionId"    column="position_id"    />
+        <result property="role"    column="role"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="level"    column="level"    />
+        <result property="no"    column="no"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+    <update id="resetPassword">
+        update member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="password != null  and password != ''">password = #{password},</if>
+        </trim>
+        where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <update id="disable">
+        update member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            level = -1,
+        </trim>
+        where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <update id="update">
+        update `member` set
+            update_by = #{updateBy} , verify_status = #{verifyStatus} ,
+            verify_user_id = #{verifyUserId} , verify_reason = #{verifyReason} ,
+            organization_id = #{organizationId} where id = #{id}
+    </update>
+
+
+    <select id="findByPhone" resultMap="MemberResult">
+
+        select  *from  member  m where m.phone = #{phone}
+
+    </select>
+
+
+    <sql id="selectMemberVo">
+        select email, name, industry_id, vip_end_time, vip_start_time, backend_image, head_image, password, belong, push_status, phone, education_id, position_id, role, organization_id, level, no, del_flag, update_by, create_by, update_time, create_time, id from member
+    </sql>
+
+    <select id="searchMemberByNameOrPhone" resultMap="MemberResult" parameterType="string">
+        <include refid="selectMemberVo"></include>
+        <where>
+             (name like concat('%', #{keyword}, '%')c
+             or phone like concat('%', #{keyword}, '%'))
+             AND del_flag = 0
+        </where>
+    </select>
+    <select id="getMember" parameterType="com.qidao.qidao.member.member.domain.MemberListReq" resultType="com.qidao.qidao.member.member.domain.MemberListRes">
+        select m.id , m.name , m.create_time , m.phone , m.level , o.type ,
+        m.verify_status verifyStatus , m.vip_start_time startTime , m.vip_end_time endTime,
+        sum(od.pay_price) price
+        from `member` m
+        left join `organization` o on m.organization_id = o.id and o.del_flag = 0
+        LEFT JOIN `order` od on m.id = od.member_id and od.`status` = 5
+        where m.del_flag = 0
+        <if test="startTime != '' and endTime != ''">
+            and m.create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and m.create_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and m.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="code != null and code != '' ">
+            and (m.phone = #{code} or m.id = #{code})
+        </if>
+        <if test="level != null">
+            and m.level = #{level}
+        </if>
+        <if test="type != null ">
+            and o.type = #{type}
+        </if>
+        GROUP BY m.id
+        order by m.create_time desc
+    </select>
+    <select id="getDetails" resultType="com.qidao.qidao.member.member.domain.MemberDetails">
+        -- GROUP_CONCAT(c.title) channel
+        SELECT m.id , m.`name` , m.phone , m.email , o.belong , m.head_image headImg , CONCAT(o.address_province_name,o.address_city_name,o.address_area_name) address , edu.val education , ind.val industry , pos.val position , sca.val scale , tsc.val techScale,
+GROUP_CONCAT(la.val) labels , GROUP_CONCAT(sc.val) dict,o.name organization , m.verify_status verifyStatus , m.license , m.qualifications,m.verify_reason msg
+        FROM `member` m
+            LEFT JOIN `organization` o on m.organization_id = o.id and o.del_flag = 0
+-- 学历
+            LEFT JOIN `select_config` edu on m.education_id = edu.id and edu.`status` = 0 and edu.del_flag = 0
+-- 行业
+            LEFT JOIN `select_config` ind on m.industry_id = ind.id and ind.`status` = 0 and ind.del_flag = 0
+-- 职位
+            LEFT JOIN `select_config` pos on m.position_id = pos.id and pos.`status` = 0 and pos.del_flag = 0
+-- 规模
+            LEFT JOIN `select_config` sca on o.scale_id = sca.id and sca.`status` = 0 and sca.del_flag = 0
+-- 服务技术规模
+            LEFT JOIN `select_config` tsc on o.tech_scale_id = tsc.id and tsc.`status` = 0 and tsc.del_flag = 0
+-- 可提供技术服务
+            LEFT JOIN `link_label` ll on m.id = ll.source_id and ll.del_flag = 0
+            LEFT JOIN `label` la on ll.label_id = la.id
+-- 科研方向
+            LEFT JOIN `link_select` ls on m.id = ls.source_id and ls.del_flag = 0
+            LEFT JOIN `select_config` sc on ls.select_config_id = sc.id and sc.`status` = 0 and sc.del_flag = 0
+        where m.del_flag = 0 and m.id = #{id}
+    </select>
+    <select id="getYesterdayData" resultType="java.lang.Integer">
+        select COUNT(*)
+        FROM `member`
+        where vip_start_time BETWEEN #{startTime} and #{endTime} and del_flag = 0
+    </select>
+    <select id="getAllVip" resultType="java.lang.Integer">
+        select COUNT(*)
+        FROM `member`
+        where level = 1 and del_flag = 0
+    </select>
+    <select id="getOrderPrice" resultType="java.math.BigDecimal">
+        select sum(pay_price)
+        from `order`
+        where status = 5
+    </select>
+    <select id="findMemberByName" resultType="com.qidao.qidao.member.member.domain.Member">
+        select id , name from `member` where del_flag = 0
+        <if test="code != null and code != ''">
+            and (
+                    name like concat(concat('%',#{code}),'%')
+                        or
+                    phone like concat(concat('%',#{code}),'%')
+                )
+        </if>
+        <if test="type == 0">
+            and level = 0
+        </if>
+        <if test="type == 1">
+            and level = 1
+        </if>
+    </select>
+</mapper>

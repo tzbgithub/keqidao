@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.advertise.advertise.mapper.TAdvertiseMapper">
+    
+    <resultMap type="com.qidao.qidao.advertise.advertise.domain.TAdvertise" id="TAdvertiseResult">
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="beginTime"    column="begin_time"    />
+        <result property="status"    column="status"    />
+        <result property="linkUrl"    column="link_url"    />
+        <result property="img"    column="img"    />
+        <result property="sequence"    column="sequence"    />
+        <result property="location"    column="location"    />
+        <result property="title"    column="title"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectTAdvertiseVo">
+        select del_flag, update_by, update_time, create_by, create_time, end_time, begin_time, status, link_url, img, sequence, location, title, id from advertise
+    </sql>
+
+    <select id="selectTAdvertiseList" parameterType="com.qidao.qidao.advertise.advertise.domain.TAdvertise" resultMap="TAdvertiseResult">
+        <include refid="selectTAdvertiseVo"/>
+        <where>  
+            AND del_flag = 0
+                                    <if test="endTime != null "> and end_time = #{endTime}</if>
+                <if test="beginTime != null "> and begin_time = #{beginTime}</if>
+                <if test="status != null "> and status = #{status}</if>
+                <if test="linkUrl != null  and linkUrl != ''"> and link_url = #{linkUrl}</if>
+                <if test="img != null  and img != ''"> and img = #{img}</if>
+                <if test="sequence != null "> and sequence = #{sequence}</if>
+                <if test="location != null "> and location = #{location}</if>
+                <if test="title != null  and title != ''"> and title = #{title}</if>
+            </where>
+    </select>
+    
+    <select id="selectTAdvertiseById" parameterType="Long" resultMap="TAdvertiseResult">
+        <include refid="selectTAdvertiseVo"/>
+        where id = #{id}
+          AND del_flag = 0
+                                                            </select>
+        
+    <insert id="insertTAdvertise" parameterType="com.qidao.qidao.advertise.advertise.domain.TAdvertise">
+        insert into advertise
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="endTime != null ">end_time,</if>
+            <if test="beginTime != null ">begin_time,</if>
+            <if test="status != null ">status,</if>
+            <if test="linkUrl != null  and linkUrl != ''">link_url,</if>
+            <if test="img != null  and img != ''">img,</if>
+            <if test="sequence != null ">sequence,</if>
+            <if test="location != null ">location,</if>
+            <if test="title != null  and title != ''">title,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="endTime != null ">#{endTime},</if>
+            <if test="beginTime != null ">#{beginTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="linkUrl != null  and linkUrl != ''">#{linkUrl},</if>
+            <if test="img != null  and img != ''">#{img},</if>
+            <if test="sequence != null ">#{sequence},</if>
+            <if test="location != null ">#{location},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTAdvertise" parameterType="com.qidao.qidao.advertise.advertise.domain.TAdvertise">
+        update advertise
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="endTime != null ">end_time = #{endTime},</if>
+            <if test="beginTime != null ">begin_time = #{beginTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="linkUrl != null  and linkUrl != ''">link_url = #{linkUrl},</if>
+            <if test="img != null  and img != ''">img = #{img},</if>
+            <if test="sequence != null ">sequence = #{sequence},</if>
+            <if test="location != null ">location = #{location},</if>
+            <if test="title != null  and title != ''">title = #{title},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTAdvertiseById" parameterType="Long">
+        delete from advertise where id = #{id}
+    </delete>
+
+    <delete id="deleteTAdvertiseByIds" parameterType="String">
+        delete from advertise where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+            <update id="logicDelByIds" parameterType="String">
+        update advertise
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                                                        </mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.msg.msg.mapper.CustomMsgMapper">
+    <select id="findMsg" resultType="com.qidao.qidao.msg.msg.domain.MsgListRes" parameterType="com.qidao.qidao.msg.msg.domain.MsgListReq">
+        SELECT m.id , m.title content , m.create_by createById ,
+               m.create_time createTime , m.push_time pushTime ,
+               m.receive_type receiveType , m.`status` ,
+               m.type, mm.name menu
+        FROM `msg` m
+        left join `msg_menu` mm on m.menu_id = mm.id
+        where m.del_flag = 0
+        <if test="title != null and title != '' ">
+            and m.title like
+            concat(concat('%',#{title}),'%')
+        </if>
+        <if test="startTime != '' and endTime != ''">
+            and m.create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and m.create_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and m.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="status != null">
+            and m.`status` = #{status}
+        </if>
+        <if test="type != null">
+            and m.type = #{type}
+        </if>
+order by m.sequence desc
+    </select>
+    <select id="findMsgDescription" resultType="com.qidao.qidao.msg.msg.domain.MsgDescriptionRes">
+        SELECT m.id , mm.`name` menuId , m.title , m.type , m.`status` , m.expire_time expireTime,
+               m.push_time pushTime, m.sequence , m.receive_type receiveType , m.max_num maxNum , m.content_type contentType,
+               m.title_type titleType , content
+        from `msg` m
+                 LEFT JOIN `msg_menu` mm on m.menu_id = mm.id and mm.del_flag = 0
+        where m.id = #{id}
+    </select>
+</mapper>

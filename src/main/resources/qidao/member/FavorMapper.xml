@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.member.favor.mapper.FavorMapper">
+    
+    <resultMap type="com.qidao.qidao.member.favor.domain.Favor" id="FavorResult">
+        <result property="dynamicId"    column="dynamic_id"    />
+        <result property="dynamicPushTime"    column="dynamic_push_time"    />
+        <result property="dynamicCommentNum"    column="dynamic_comment_num"    />
+        <result property="dynamicLikeNum"    column="dynamic_like_num"    />
+        <result property="dynamicLabelStr"    column="dynamic_label_str"    />
+        <result property="dynamicSummary"    column="dynamic_summary"    />
+        <result property="dynamicImg"    column="dynamic_img"    />
+        <result property="dynamicTitle"    column="dynamic_title"    />
+        <result property="dynamicPushMemberId"    column="dynamic_push_member_id"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectFavorVo">
+        select dynamic_id, dynamic_push_time, dynamic_comment_num, dynamic_like_num, dynamic_label_str, dynamic_summary, dynamic_img, dynamic_title, dynamic_push_member_id, member_id, del_flag, update_by, create_by, update_time, create_time, id from favor
+    </sql>
+
+    <select id="selectFavorList" parameterType="com.qidao.qidao.member.favor.domain.Favor" resultMap="FavorResult">
+        <include refid="selectFavorVo"/>
+        <where>  
+                <if test="dynamicId != null "> and dynamic_id = #{dynamicId}</if>
+                <if test="dynamicPushTime != null "> and dynamic_push_time = #{dynamicPushTime}</if>
+                <if test="dynamicCommentNum != null "> and dynamic_comment_num = #{dynamicCommentNum}</if>
+                <if test="dynamicLikeNum != null "> and dynamic_like_num = #{dynamicLikeNum}</if>
+                <if test="dynamicLabelStr != null  and dynamicLabelStr != ''"> and dynamic_label_str = #{dynamicLabelStr}</if>
+                <if test="dynamicSummary != null  and dynamicSummary != ''"> and dynamic_summary = #{dynamicSummary}</if>
+                <if test="dynamicImg != null  and dynamicImg != ''"> and dynamic_img = #{dynamicImg}</if>
+                <if test="dynamicTitle != null  and dynamicTitle != ''"> and dynamic_title = #{dynamicTitle}</if>
+                <if test="dynamicPushMemberId != null "> and dynamic_push_member_id = #{dynamicPushMemberId}</if>
+                <if test="memberId != null "> and member_id = #{memberId}</if>
+            AND del_flag = 0
+                                </where>
+    </select>
+    
+    <select id="selectFavorById" parameterType="Long" resultMap="FavorResult">
+        <include refid="selectFavorVo"/>
+        where id = #{id}
+                                                  AND del_flag = 0
+                            </select>
+        
+    <insert id="insertFavor" parameterType="com.qidao.qidao.member.favor.domain.Favor">
+        insert into favor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dynamicId != null ">dynamic_id,</if>
+            <if test="dynamicPushTime != null ">dynamic_push_time,</if>
+            <if test="dynamicCommentNum != null ">dynamic_comment_num,</if>
+            <if test="dynamicLikeNum != null ">dynamic_like_num,</if>
+            <if test="dynamicLabelStr != null  and dynamicLabelStr != ''">dynamic_label_str,</if>
+            <if test="dynamicSummary != null  and dynamicSummary != ''">dynamic_summary,</if>
+            <if test="dynamicImg != null  and dynamicImg != ''">dynamic_img,</if>
+            <if test="dynamicTitle != null  and dynamicTitle != ''">dynamic_title,</if>
+            <if test="dynamicPushMemberId != null ">dynamic_push_member_id,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dynamicId != null ">#{dynamicId},</if>
+            <if test="dynamicPushTime != null ">#{dynamicPushTime},</if>
+            <if test="dynamicCommentNum != null ">#{dynamicCommentNum},</if>
+            <if test="dynamicLikeNum != null ">#{dynamicLikeNum},</if>
+            <if test="dynamicLabelStr != null  and dynamicLabelStr != ''">#{dynamicLabelStr},</if>
+            <if test="dynamicSummary != null  and dynamicSummary != ''">#{dynamicSummary},</if>
+            <if test="dynamicImg != null  and dynamicImg != ''">#{dynamicImg},</if>
+            <if test="dynamicTitle != null  and dynamicTitle != ''">#{dynamicTitle},</if>
+            <if test="dynamicPushMemberId != null ">#{dynamicPushMemberId},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFavor" parameterType="com.qidao.qidao.member.favor.domain.Favor">
+        update favor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dynamicId != null ">dynamic_id = #{dynamicId},</if>
+            <if test="dynamicPushTime != null ">dynamic_push_time = #{dynamicPushTime},</if>
+            <if test="dynamicCommentNum != null ">dynamic_comment_num = #{dynamicCommentNum},</if>
+            <if test="dynamicLikeNum != null ">dynamic_like_num = #{dynamicLikeNum},</if>
+            <if test="dynamicLabelStr != null  and dynamicLabelStr != ''">dynamic_label_str = #{dynamicLabelStr},</if>
+            <if test="dynamicSummary != null  and dynamicSummary != ''">dynamic_summary = #{dynamicSummary},</if>
+            <if test="dynamicImg != null  and dynamicImg != ''">dynamic_img = #{dynamicImg},</if>
+            <if test="dynamicTitle != null  and dynamicTitle != ''">dynamic_title = #{dynamicTitle},</if>
+            <if test="dynamicPushMemberId != null ">dynamic_push_member_id = #{dynamicPushMemberId},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFavorById" parameterType="Long">
+        delete from favor where id = #{id}
+    </delete>
+
+    <delete id="deleteFavorByIds" parameterType="String">
+        delete from favor where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+                                                    <update id="logicDelByIds" parameterType="String">
+        update favor
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </update>
+                        </mapper>

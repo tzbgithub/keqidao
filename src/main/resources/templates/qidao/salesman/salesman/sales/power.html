@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('销售员授权')" />
+    <th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-dynamic-add" th:object="${los}">
+        <input id="id" th:field="*{id}" type="hidden">
+        <input id="salesmanId" th:field="*{salesmanId}" type="hidden">
+        <input id="memberId" th:field="*{memberId}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">运营人员：</label>
+            <div class="col-sm-8">
+                <input name="title" class="form-control" type="text"  th:field="*{salesmanName}" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">会员：</label>
+            <div class="col-sm-8">
+                <input name="title" class="form-control" type="text"  th:field="*{memberName}" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <th:block th:include="code :: upload_html(imgId='authorizedImg',showStr='授权文件')" />
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<th:block th:include="code :: cos_img_js('authorizedImg')"/>
+<script type="text/javascript">
+    var prefix = ctx + "salesman/sales"
+
+    function submitHandler() {
+        let authorizedImg = $('#authorizedImg').val();
+        if(! authorizedImg){
+            $.modal.error('请上传授权文件');
+        }
+        if ($.validate.form()) {
+            let data = {
+                id:$('#id').val(),
+                salesmanId:$('#salesmanId').val(),
+                memberId:$('#memberId').val(),
+                authorizedImg:authorizedImg,
+                authorizedSalesman:$('#salesmanId').val(),
+            }
+            var config = {
+                url: prefix+"/authorized",
+                type: "post",
+                dataType: "json",
+                data: data,
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                    $.modal.disable();
+                },
+                success: function(result) {
+                    $.modal.closeLoading();
+                    $.modal.close();
+                    $.modal.msgSuccess(result.msg);
+                    $.modal.refresh();
+                }
+            };
+            $.ajax(config)
+        }
+    }
+</script>
+</body>
+</html>

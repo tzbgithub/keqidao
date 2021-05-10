@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增收藏')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-favor-add">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">标题：</label>
+                <div class="col-sm-3">
+                    <input id="dynamicTitle" class="form-control" type="text">
+                </div>
+                <div class="col-sm-1">
+                    <btn class="btn btn-info  btn-sm" onclick="searchDynamic()"><i class="fa fa-search"></i>搜索</btn>
+                </div>
+                <div class="col-sm-4">
+                    <select name="dynamicId" onchange="showTitle()" id="dynamicId" class="form-control" required>
+                        <option value="-1">==请先搜索==</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">收藏动态用户：</label>
+                <div class="col-sm-3">
+                    <input id="memberName" placeholder="用户名/手机号" class="form-control" type="text" >
+                </div>
+                <div class="col-sm-1">
+                    <btn class="btn btn-info  btn-sm" onclick="searchMemberName()"><i class="fa fa-search"></i>搜索</btn>
+                </div>
+                <div class="col-sm-4">
+                    <select name="memberId" id="memberId" onchange="showMemberName()" class="form-control" required>
+                        <option value="-1">==请先搜索==</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "member/favor"
+        $("#form-favor-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                let dynamicId = parseInt($("#dynamicId").val());
+                let memberId = parseInt($("#memberId").val());
+                if (dynamicId === -1){
+                    $.modal.msg("请选择动态标题", modal_status.FAIL);
+                    $('#dynamicId')[0].style.border="1px solid red";
+                    return;
+                }
+                if (memberId === -1){
+                    $.modal.msg("请选择收藏动态用户", modal_status.FAIL);
+                    $('#memberId')[0].style.border="1px solid red";
+                    return;
+                }
+                $.operate.save(prefix + "/create", $('#form-favor-add').serialize());
+            }
+        }
+        function searchDynamic(){
+            $.ajax({
+                url:prefix+"/getDynamic",
+                data:{
+                    title: $("#dynamicTitle").val()
+                },
+                type:"get",
+                dataType:"json",
+                success:function (data) {
+                    let father = data;
+                    document.getElementById("dynamicId").options.length = 0;
+                    if (father.length === 0){
+                        $("#dynamicId").append("<option value='-1'>==无结果请重新查询==</option>")
+                    }else {
+                        if (father[0].id != null){
+                            $("#dynamicId").append("<option value='-1'>==请选择==</option>")
+                        }
+                        for(let i = 0 ; i<father.length ; i++){
+                            $("#dynamicId").append("<option value='"+father[i].id+"'>"+father[i].title+"</option>")
+                        }
+                    }
+                }
+            })
+        }
+
+        function showTitle (){
+            let obj=document.getElementById("dynamicId");
+            let text = '';
+            for(let i=0;i<obj.length;i++) {//下拉框的长度就是它的选项数.
+                if(obj[i].selected==true) {
+                    text=obj[i].text;//获取当前选择项的文本.
+                }
+            }
+            $("#dynamicTitle").val(text);
+        }
+
+        function showMemberName (){
+            let obj=document.getElementById("memberId");
+            let text = '';
+            for( let i=0;i<obj.length;i++) {//下拉框的长度就是它的选项数.
+                if(obj[i].selected==true) {
+                    text=obj[i].text;//获取当前选择项的文本.
+                }
+            }
+            $("#memberName").val(text);
+        }
+
+        function searchMemberName(){
+            $.ajax({
+                url:prefix+"/getMember",
+                data:{
+                    name: $("#memberName").val()
+                },
+                type:"get",
+                dataType:"json",
+                success:function (data) {
+                    let father = data;
+                    document.getElementById("memberId").options.length = 0;
+                    if (father.length === 0){
+                        $("#memberId").append("<option value='-1'>==无结果请重新查询==</option>")
+                    }else {
+                        if (father[0].id != null) {
+                            $("#memberId").append("<option value='-1'>==请选择==</option>")
+                        }
+                        for (let i = 0; i < father.length; i++) {
+                            $("#memberId").append("<option value='" + father[i].id + "'>" + father[i].name + "</option>")
+                        }
+                    }
+                }
+            })
+        }
+
+        $("input[name='dynamicPushTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+    </script>
+</body>
+</html>

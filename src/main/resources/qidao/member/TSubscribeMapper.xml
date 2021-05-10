@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.member.subscribe.mapper.TSubscribeMapper">
+
+    <resultMap type="com.qidao.qidao.member.subscribe.domain.TSubscribe" id="SubscribeResult">
+        <result property="subscribeOrganizationName" column="subscribe_organization_name"/>
+        <result property="subscribePosition" column="subscribe_position"/>
+        <result property="subscribeName" column="subscribe_name"/>
+        <result property="subscribeHeadImg" column="subscribe_head_img"/>
+        <result property="type" column="type"/>
+        <result property="subscribeTime" column="subscribe_time"/>
+        <result property="subscribeId" column="subscribe_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="id" column="id"/>
+    </resultMap>
+
+    <sql id="selectSubscribeVo">
+        select subscribe_organization_name,
+               subscribe_position,
+               subscribe_name,
+               subscribe_head_img,
+               type,
+               subscribe_time,
+               subscribe_id,
+               member_id,
+               del_flag,
+               update_by,
+               create_by,
+               update_time,
+               create_time,
+               id
+        from subscribe
+    </sql>
+
+    <select id="selectSubscribeList" parameterType="com.qidao.qidao.member.subscribe.domain.TSubscribe"
+            resultMap="SubscribeResult">
+        <include refid="selectSubscribeVo"/>
+        <where>
+            <if test="subscribeOrganizationName != null  and subscribeOrganizationName != ''">and
+                subscribe_organization_name like concat('%', #{subscribeOrganizationName}, '%')
+            </if>
+            <if test="subscribePosition != null  and subscribePosition != ''">and subscribe_position =
+                #{subscribePosition}
+            </if>
+            <if test="subscribeName != null  and subscribeName != ''">and subscribe_name like concat('%',
+                #{subscribeName}, '%')
+            </if>
+            <if test="subscribeHeadImg != null  and subscribeHeadImg != ''">and subscribe_head_img =
+                #{subscribeHeadImg}
+            </if>
+            <if test="type != null ">and type = #{type}</if>
+            <if test="subscribeTime != null ">and subscribe_time = #{subscribeTime}</if>
+            <if test="subscribeId != null ">and subscribe_id = #{subscribeId}</if>
+            <if test="memberId != null ">and member_id = #{memberId}</if>
+            AND del_flag = 0
+        </where>
+    </select>
+
+    <select id="selectSubscribeById" parameterType="Long" resultMap="SubscribeResult">
+        <include refid="selectSubscribeVo"/>
+        where id = #{id}
+        AND del_flag = 0
+    </select>
+
+    <insert id="insertSubscribe" parameterType="com.qidao.qidao.member.subscribe.domain.TSubscribe">
+        insert into subscribe
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="subscribeOrganizationName != null  and subscribeOrganizationName != ''">
+                subscribe_organization_name,
+            </if>
+            <if test="subscribePosition != null  and subscribePosition != ''">subscribe_position,</if>
+            <if test="subscribeName != null  and subscribeName != ''">subscribe_name,</if>
+            <if test="subscribeHeadImg != null  and subscribeHeadImg != ''">subscribe_head_img,</if>
+            <if test="type != null ">type,</if>
+            <if test="subscribeTime != null ">subscribe_time,</if>
+            <if test="subscribeId != null ">subscribe_id,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="subscribeOrganizationName != null  and subscribeOrganizationName != ''">
+                #{subscribeOrganizationName},
+            </if>
+            <if test="subscribePosition != null  and subscribePosition != ''">#{subscribePosition},</if>
+            <if test="subscribeName != null  and subscribeName != ''">#{subscribeName},</if>
+            <if test="subscribeHeadImg != null  and subscribeHeadImg != ''">#{subscribeHeadImg},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="subscribeTime != null ">#{subscribeTime},</if>
+            <if test="subscribeId != null ">#{subscribeId},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSubscribe" parameterType="com.qidao.qidao.member.subscribe.domain.TSubscribe">
+        update subscribe
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="subscribeOrganizationName != null  and subscribeOrganizationName != ''">
+                subscribe_organization_name = #{subscribeOrganizationName},
+            </if>
+            <if test="subscribePosition != null  and subscribePosition != ''">subscribe_position =
+                #{subscribePosition},
+            </if>
+            <if test="subscribeName != null  and subscribeName != ''">subscribe_name = #{subscribeName},</if>
+            <if test="subscribeHeadImg != null  and subscribeHeadImg != ''">subscribe_head_img = #{subscribeHeadImg},
+            </if>
+            <if test="type != null ">type = #{type},</if>
+            <if test="subscribeTime != null ">subscribe_time = #{subscribeTime},</if>
+            <if test="subscribeId != null ">subscribe_id = #{subscribeId},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSubscribeById" parameterType="Long">
+        delete
+        from subscribe
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteSubscribeByIds" parameterType="Long">
+        delete from subscribe where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="logicDelByIds" parameterType="Long">
+        update subscribe
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

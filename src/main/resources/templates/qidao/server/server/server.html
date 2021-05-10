@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('服务(需求)列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>标题：</p>
+                                <input type="text" name="title"/>
+                            </li>
+                            <li>
+                                <p>需求领域：</p>
+                                <select name="specAreaId" id="specAreaId">
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>时间：</p>
+                                <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                            </li>
+                            <li>
+                                <p>状态：</p>
+                                <select name="status">
+                                    <option value="">所有</option>
+                                    <option value="1">已上架</option>
+                                    <option value="2">已承接</option>
+                                    <option value="3">已取消</option>
+
+                                </select>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="server:server:add">
+                    <em class="fa fa-plus"></em> 代发布
+                </a>
+                <!--<a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="server:server:edit">
+                    <em class="fa fa-edit"></em> 修改
+                </a>-->
+                <!--<a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="server:server:logicRemove">
+                    <em class="fa fa-remove"></em> 逻辑删除
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="server:server:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>-->
+                <!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="server:server:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('server:server:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('server:server:remove')}]];
+        var prefix = ctx + "server/server";
+        var configPrefix = ctx + "config/select";
+
+        function toDetails(id) {
+            $.modal.openOptions({
+                title: "服务（需求）详情",
+                url: prefix + "/look/" + id,
+                yes: function (index, layero) {
+                    var iframeWin = layero.find('iframe')[0];
+                    iframeWin.contentWindow.submitHandler(index, layero);
+                },
+            });
+        }
+
+        $(function() {
+
+            $.ajax({
+                url: configPrefix+"/getConfigByType/0",
+                data: {},
+                type: "get",
+                dataType: "json",
+                success: function (data){
+                    $("#specAreaId").empty();
+                    $("#specAreaId").append("<option value=''>所有</option>")
+                    for(let i = 0 ; i<data.length ; i++){
+                        $("#specAreaId").append("<option value='"+data[i].id+"'>"+data[i].val+"</option>")
+                    }
+                }
+            })
+
+            var options = {
+                url: prefix + "/getList",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                logicRemoveUrl: prefix + "/logicRemove",
+                exportUrl: prefix + "/export",
+                modalName: "服务(需求)",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'id',
+                    title : 'id'
+                },
+                {
+                    field : 'title',
+                    title : '标题'
+                },
+                {
+                    field : 'createTime',
+                    title : '发布时间'
+                },
+                {
+                    field : 'memberName',
+                    title : '发布人'
+                },
+                {
+                    field : 'specArea',
+                    title : '需求领域'
+                },
+
+                {
+                    field : 'status', 
+                    title : '状态',
+                    formatter: function (value, row, index){
+                        switch (value){
+                            case 0: return '<span style="color: red">未上架</span>';
+                            case 1: return '<span style="color: green">已上架</span>';
+                            case 2: return '<span style="color: dodgerblue">已承接</span>';
+                            case 3: return '<span style="color: red">已取消</span>';
+                        }
+                    }
+                },
+
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        if (row.status === 1 ){
+                            actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="revoke(\'' + row.id + '\')">撤销</a> ');
+                        }
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="toDetails(\'' + row.id + '\')">查看</a> ');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        function revoke(id){
+            $.modal.confirm("确定撤销该条" + $.table._option.modalName + "吗？", function() {
+                $.operate.submit(prefix+"/revoke/"+id , "put" ,"json" , null );
+            });
+        }
+
+    </script>
+</body>
+</html>

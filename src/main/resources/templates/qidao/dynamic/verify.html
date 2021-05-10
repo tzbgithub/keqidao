@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+  <th:block th:include="include :: header('审核动态')" />
+  <th:block th:include="include :: datetimepicker-css" />
+  <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+  <form class="form-horizontal m" id="form-dynamic-edit" th:object="${dynamic}">
+    <input name="id" id="dynamicId" th:field="*{id}" type="hidden">
+    <div class="form-group">
+      <label class="col-sm-3 control-label">标题：</label>
+      <div class="col-sm-8">
+        <input name="img" th:field="*{title}" class="form-control" type="text" readonly>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-3 control-label">作者：</label>
+      <div class="col-sm-8">
+        <input name="verifyUserId" th:field="*{memberName}" class="form-control" type="text" readonly>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-3 control-label">时间：</label>
+      <div class="col-sm-3">
+        <input name="verifyReason" th:field="*{publishTime}" class="form-control" type="text" readonly>
+      </div>
+      <label class="col-sm-2 control-label">状态：</label>
+      <div class="col-sm-3" th:switch="*{verifyStatus}">
+        <input name="" th:case="0" class="form-control" type="text" value="待审核" readonly>
+        <input name="" th:case="1" class="form-control" type="text" value="待核准" readonly>
+        <input name="" th:case="2" class="form-control" type="text" value="已拒绝" readonly>
+        <input name="" th:case="3" class="form-control" type="text" value="已上架" readonly>
+      </div>
+    </div>
+
+    <div class="form-group" th:if="*{content} ne null and *{content} ne ''">
+      <label class="col-sm-3 control-label">内容：</label>
+      <div class="col-sm-8">
+        <textarea name="content" class="form-control" th:field="*{content}" rows="3" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="form-group" th:if="*{url} ne null and *{url} ne ''">
+      <label class="col-sm-3 control-label">链接：</label>
+      <div class="col-sm-8">
+        <input name="url" th:field="*{url}" class="form-control" type="text" readonly>
+      </div>
+    </div>
+
+    <div class="form-group" th:if="*{img} ne null">
+      <label class="col-sm-3 control-label">图片：</label>
+      <div class="col-sm-9" id="imgDiv">
+      </div>
+    </div>
+
+
+    <div class="form-group" th:if="*{thumb} ne null and *{thumb} ne ''">
+      <label class="col-sm-3 control-label">封面：</label>
+      <div class="col-sm-9">
+        <img id="thumbImg" class="col-sm-5" src="" width="500px" height="200px">
+      </div>
+    </div>
+
+    <div class="form-group" th:if="*{video} ne null and *{video} ne ''">
+      <label class="col-sm-3 control-label">视频：</label>
+      <div class="col-sm-9">
+        <video  src="" width="400px" height="200px" id="video" controls></video>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-3 control-label">频道：</label>
+      <div class="col-sm-9" id="channelDiv">
+
+      </div>
+    </div>
+  </form>
+
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: datetimepicker-js" />
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<th:block th:include="code :: cos_img_js('img')"/>
+<th:block th:include="code :: cos_img_js('thumb')"/>
+<th:block th:include="code :: cos_img_js('video')"/>
+<script type="text/javascript" th:inline="javascript">
+  var prefix = ctx + "dynamic";
+  $("#form-dynamic-edit").validate({
+    focusCleanup: true
+  });
+  var channel = [[${dynamic.channelId}]];
+  var imgPrefix = Base.Picture.getDown();
+  var thumb = [[${dynamic.thumb}]];
+  var video =[[${dynamic.video}]];
+  var imgs = [[${dynamic.img}]];
+
+  /**
+   * 上架按钮方法
+   */
+  function approvalPass(){
+    var dynamicId = $("#dynamicId").val();
+    var sss = $('#channelDiv input[name="channel"]:checked ').val();
+    $.ajax({
+      url: prefix+"/approvalDynamicPass",
+      data:{
+        id: dynamicId,
+        channel: sss
+      },
+      type:"post",
+      dataType:"json",
+      success:function (data) {
+      }
+    })
+  }
+
+  function submitHandler() {
+    if ($.validate.form()) {
+      var dynamicId = $("#dynamicId").val();
+      var sss = $('#channelDiv input[name="channel"]:checked ').val();
+      $.operate.save(prefix+"/verifyDynamicPass", {
+        id: dynamicId,
+        channel: sss,
+        oldChannels: channel
+      });
+    }
+  }
+
+
+  $(function (){
+    if (Bee.StringUtils.isNotEmpty(thumb)){
+      $("#thumbImg").attr('src' ,imgPrefix + thumb);
+    }
+    if (Bee.StringUtils.isNotEmpty(video)){
+      $("#video").attr('src' ,imgPrefix + video);
+    }
+    if (imgs != null && imgs.length > 0){
+      for (let i = 0; i < imgs.length; i++) {
+        var image = imgPrefix + imgs[i];
+        let html = '<img class="col-sm-5" src="'+image+'" width="200px" height="200px">';
+        $("#imgDiv").append(html)
+      }
+    }
+    $.ajax({
+      url: prefix+"/getChannel",
+      data:{},
+      type:"get",
+      dataType:"json",
+      success:function (data) {
+        for (let i=0;i<data.length;i++){
+          let html = '<label class="radio-inline col-sm-3">\n' +
+                  '  <input type="radio" name="channel" value="'+data[i].channelId+'"> '+data[i].title+'\n' +
+                  '</label>';
+          $("#channelDiv").append(html)
+        }
+        //设置radio的name为channel选中值
+        $("input[name='channel']").get(0).checked = true;
+        $("input[name='channel']").each(function(index) {
+          if ($("input[name='channel']").get(index).value == channel) {
+            $("input[name='channel']").get(index).checked = true;
+          }
+        });
+      }
+    })
+  })
+</script>
+</body>
+</html>

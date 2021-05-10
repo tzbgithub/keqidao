@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.feedback.feedback.mapper.CustomFeedbackMapper">
+    <select id="findFeedbackRes" resultType="com.qidao.qidao.feedback.feedback.domain.FeedbackPageRes">
+        SELECT
+        f.id,
+        m.`name`,
+        m.phone,
+        f.create_time createTime,
+        sc.val reason,
+        f.description,
+        f.`status`,
+        f.reply,
+        m.`level`,
+        f.reply_user_id createById
+        FROM 	`feedback` f
+        LEFT JOIN `member` m on  f.member_id = m.id
+        LEFT JOIN `select_config` sc on f.reason_id = sc.id and sc.del_flag = 0 and sc.`status` = 0
+        where f.del_flag = 0
+        <if test="startTime != '' and endTime != ''">
+            and f.create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and f.create_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and f.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="member != null and member != '' ">and (m.name like concat(concat('%',#{member}),'%') or m.phone like concat(concat('%',#{member}),'%'))</if>
+        <if test="reasonId != null "> and f.reason_id = #{reasonId}</if>
+        <if test="status != null "> and f.status = #{status}</if>
+        order by f.status asc , m.level desc , f.create_time asc
+    </select>
+</mapper>

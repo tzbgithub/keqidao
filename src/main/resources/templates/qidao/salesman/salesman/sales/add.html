@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增销售关联组织机构')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-sales-add">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">组织机构名称：</label>
+                <div class="col-sm-8">
+                    <input name="organizationName" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">关联类型 (0-无实验室新增 1-已有此实验室)：</label>
+                <div class="col-sm-8">
+                    <select name="type" class="form-control m-b">
+                        <option value="">所有</option>
+                    </select>
+                    <span class="help-block m-b-none"><em class="fa fa-info-circle"></em> 代码生成请选择字典属性</span>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">销售员名字：</label>
+                <div class="col-sm-8">
+                    <input name="salesmanName" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">销售员标识：</label>
+                <div class="col-sm-8">
+                    <input name="salesmanId" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">组织机构标识：</label>
+                <div class="col-sm-8">
+                    <input name="organizationId" class="form-control" type="text" required>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script type="text/javascript">
+        var prefix = ctx + "salesman/sales"
+        $("#form-sales-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-sales-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

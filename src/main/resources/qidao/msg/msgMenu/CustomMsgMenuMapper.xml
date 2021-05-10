@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.msg.msgMenu.mapper.CustomMsgMenuMapper">
+    <select id="findMsgMenuList" resultType="com.qidao.qidao.msg.msgMenu.domain.MsgMenuListRes">
+        SELECT m.id , m.`name` , mm.`name` fatherName , m.create_by createById , m.`status` , m.thumb , m.create_time createTime
+        FROM `msg_menu` m
+                 LEFT JOIN `msg_menu` mm on m.pid = mm.id
+        where m.del_flag = 0
+    </select>
+</mapper>

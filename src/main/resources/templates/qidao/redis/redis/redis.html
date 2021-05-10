@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('redis管理')" />
+</head>
+<body class="gray-bg">
+<div class="row  border-bottom white-bg dashboard-header">
+    <div class="col-sm-2">
+        <button class="btn btn-primary btn-block ">
+            <div>redis 键总数量</div>
+            <div id="allData">10</div>
+        </button>
+    </div>
+</div>
+     <div class="container-div">
+        <div class="row">
+
+            <div class="col-sm-12 search-collapse">
+
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>key名称：</p>
+                                <input type="text" name="keyName" id="keyName"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="searchKey()"><em class="fa fa-search"></em>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="searchKeyReset()"><em class="fa fa-refresh"></em>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="order:order:add">
+                    <em class="fa fa-plus"></em> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="order:order:edit">
+                    <em class="fa fa-edit"></em> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()" shiro:hasPermission="order:order:logicRemove">
+                    <em class="fa fa-remove"></em> 逻辑删除
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="order:order:remove">
+                    <em class="fa fa-remove"></em> 删除
+                </a>-->
+                <!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="order:order:export">
+                    <em class="fa fa-download"></em> 导出
+                 </a>-->
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" class="col-sm-12">
+                    <tr>
+                        <td class="active col-sm-4">
+                            <div class="list-group" id="keys" data-spy="scroll" data-offset="0" style="height:600px;overflow:auto;position:relative;" >
+                            </div>
+                        </td>
+                        <td class="col-sm-8" style="height:600px;">
+                                <table class="table" style="height: 100%">
+                                    <tr style="height: 15%">
+                                        <td >KEY</td>
+                                        <td >类型</td>
+                                        <td>TTL(秒)</td>
+                                        <td >操作</td>
+                                    </tr>
+                                    <tr id="keyInfo" style="height: 20%">
+
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <p>值</p>
+                                            <div id="value">
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">修改redis存活时间</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">剩余时间：</label>
+                    <div class="col-sm-8">
+                        <input id="ttlTime"  class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="setTTL()">设置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+      /*  var editFlag = [[${@permission.hasPermi('redis:redis:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('redis:redis:delete')}]];*/
+        var prefix = ctx + "redis/redis";
+
+        $(function() {
+            $.ajax({
+                url: prefix+"/keyAll",
+                data: {},
+                type: "post",
+                dataType: "json",
+                success: function (data){
+                    $("#allData").text(data.length);
+                    showKeys(data);
+                }
+            })
+        });
+        function showKeys(keys){
+            $("#keys").html("<a href='javascript:void(0);' class=\"list-group-item active text-center\"> redis 键 </a>");
+
+            $(keys).each((i,value) => {
+                let dom = `<a href='javascript:void(0);' class="list-group-item text-center" onclick="info('${value}')">${value} </a>`;
+                $("#keys").append(dom)
+            });
+        }
+
+        function searchKeyReset(){
+            $("#keyName").val("");
+            searchKey();
+        }
+
+        function searchKey(){
+            $.ajax({
+                url: prefix+"/queryKeys",
+                data: {key:$("#keyName").val()},
+                type: "post",
+                dataType: "json",
+                success: function (data){
+                    if($("#keyName").val().trim().length == 0){
+                        $("#allData").text(data.length);
+                    }
+                    showKeys(data);
+                    $("#keyInfo").html("");
+                    $("#value").html("");
+                }
+            })
+        }
+
+        function info(key) {
+            $.ajax({
+                url: prefix + "/getInfoByKey",
+                data: {key},
+                type: "post",
+                dataType: "json",
+                success: function (data) {
+                    let dom = `<td id='mainKey'>${data.key}</td><td >${data.type}</td><td id="ttlTimeOld">${data.ttlTime}</td><td>`;
+                    dom += `<a class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModal" onclick="editTime()"><em class="fa fa-edit"></em>设置时间</a>`;
+                    dom += `<a class="btn btn-danger btn-xs" href="#" onclick="deleteByKey('${data.key}')"><em class="fa fa-remove"></em>删除</a></td>`;
+                    $("#keyInfo").html(dom);
+                    $("#value").html(`<textarea class='col-sm-12' rows=\"10\" cols=\"150\">${data.value}</textarea>`);
+                }
+            })
+        }
+
+        function editTime(){
+            $("#ttlTime").val($("#ttlTimeOld").text());
+        }
+
+        function deleteByKey(key){
+            $.modal.confirm("确定删除该条缓存信息吗？", function() {
+                $.ajax({
+                    url: prefix+"/delete",
+                    data: {key},
+                    type: "post",
+                    dataType: "json",
+                    success: function (data){
+                        searchKey();
+                    }
+                })
+            });
+        }
+
+        function setTTL(){
+            let key = $("#mainKey").text();
+            $.ajax({
+                url: prefix+"/setTTL",
+                data: {key,second:$("#ttlTime").val()},
+                type: "post",
+                dataType: "json",
+                success: function (data){
+                   console.log(data)
+                }
+            })
+            $('#myModal').modal('hide');
+            info(key);
+        }
+
+
+    </script>
+</body>
+</html>

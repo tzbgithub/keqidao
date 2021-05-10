@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('反馈列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>投诉人：</p>
+                            <input placeholder="用户名/手机号" name="member" type="text">
+                        </li>
+                        <li>
+                            <p>反馈原因：</p>
+                            <select id="reasonId" name="reasonId">
+
+                            </select>
+                        </li>
+                        <li>
+                            <p>状态：</p>
+                            <select name="status">
+                                <option value="">所有</option>
+                                <option value="0">未处理</option>
+                                <option value="1">处理中</option>
+                                <option value="2">已处理</option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <p>时间：</p>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em
+                                    class="fa fa-search"></em>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em
+                                    class="fa fa-refresh"></em>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.logicRemoveAll()"
+               shiro:hasPermission="feedback:feedback:logicRemove">
+                <em class="fa fa-remove"></em> 逻辑删除
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="feedback:feedback:remove">
+                <em class="fa fa-remove"></em> 删除
+            </a>
+            <!--                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="feedback:feedback:export">-->
+            <!--                    <em class="fa fa-download"></em> 导出-->
+            <!--                 </a>-->
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('feedback:feedback:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('feedback:feedback:remove')}]];
+    var prefix = ctx + "feedback/feedback";
+    var configPrefix = ctx + "config/select/getConfigByType/"
+    $(function () {
+
+        $.ajax({
+            url: configPrefix+8,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                $("#reasonId").empty();
+                $("#reasonId").append("<option value=''>所有</option>");
+                for(let i = 0 ; i<data.length ; i++){
+                    $("#reasonId").append("<option value='"+data[i].id+"'>"+data[i].val+"</option>")
+                }
+            }
+        })
+        var options = {
+            url: prefix + "/getList",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            logicRemoveUrl: prefix + "/logicRemove",
+            exportUrl: prefix + "/export",
+            modalName: "反馈",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'name',
+                    title: '用户名'
+                },
+                {
+                    field: 'phone',
+                    title: '手机号'
+                },
+                {
+                    field: 'createTime',
+                    title: '提交时间'
+                },
+
+                {
+                    field: 'reason',
+                    title: '反馈类型'
+                },
+                {
+                    field: 'description',
+                    title: '反馈原因'
+                },
+                {
+                    field: 'level',
+                    title: '会员等级',
+                    formatter(level) {
+                        switch (level) {
+                            case 1 :
+                                return '<span class="label label-warning">VIP用户</span>'
+                            case 0 :
+                                return '<span>普通用户</span>'
+                        }
+                    }
+                },
+                {
+                    field: 'status',
+                    title: '处理状态',
+                    formatter(status) {
+                        switch (status) {
+                            case 0 :
+                                return '<span style="color: red">未处理</span>'
+                            case 1 :
+                                return '<span style="color: red">处理中</span>'
+                            case 2 :
+                                return '<span style="color: green">已处理</span>'
+                        }
+                    }
+                },
+                {
+                    field: 'reply',
+                    title: '回复内容',
+                },
+                {
+                    field: 'createByName',
+                    title: '处理人',
+                },
+                {
+                    field: 'id',
+                    title: '主键',
+                    visible: false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        switch (row.status) {
+                            case 0 :
+                                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="reply(\'' + row.id + '\')"><em class="fa fa-edit"></em>回复</a> ');
+                                break;
+                            case 1 :
+                                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="reply(\'' + row.id + '\')"><em class="fa fa-edit"></em>回复</a> ');
+                                break;
+                            case 2 :
+                                break;
+                        }
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><em class="fa fa-remove"></em>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    function reply(id) {
+        layer.prompt({title: '回复信息', formType: 2,}, function (text, index) {
+            var url = prefix + "/reply";
+            var data = {
+                id: id,
+                reply: text,
+            };
+            var config = {
+                url: url,
+                type: "post",
+                dataType: "json",
+                data: data,
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                    $.modal.disable();
+                },
+                success: function (result) {
+                    $.modal.close();
+                    $.modal.msgSuccess(result.msg);
+                    $.table.refresh();
+                    $.modal.closeLoading();
+                    $.modal.enable();
+                }
+            };
+            $.ajax(config)
+            layer.close(index);
+        });
+    }
+</script>
+</body>
+</html>

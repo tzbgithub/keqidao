@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增用户')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-member-add">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">操作类型：</label>
+                <div class="col-sm-8">
+                    <select name="type" class="form-control" id="type" onchange="showTimeDiv()">
+                        <option value="0">添加会员</option>
+                        <option value="1">移除会员</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">用户：</label>
+                <div class="col-sm-3">
+                    <input id="memberName" placeholder="用户名/手机号" class="form-control" type="text">
+                </div>
+                <div class="col-sm-1">
+                    <btn class="btn btn-info  btn-sm" onclick="searchMemberName()"><i class="fa fa-search"></i>搜索</btn>
+                </div>
+                <div class="col-sm-4">
+                    <select name="id" id="memberId" onchange="showMemberName()" class="form-control" required>
+                        <option value="-1">==请先搜索==</option>
+                    </select>
+                </div>
+            </div>
+            <div id="timeDiv">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">vip开始时间：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group date">
+                            <span class="input-group-addon"><em class="fa fa-calendar"></em></span>
+                            <input name="vipStartTime" id="vipStartTime" class="form-control" placeholder="年：月：日 时：分：秒" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">vip结束时间：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group date">
+                            <span class="input-group-addon"><em class="fa fa-calendar"></em></span>
+                            <input name="vipEndTime" id="vipEndTime" class="form-control" placeholder="年：月：日 时：分：秒" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "member/member"
+        $("#form-member-add").validate({
+            focusCleanup: true
+        });
+
+        function showTimeDiv(){
+            var type = $("#type").val();
+            $("#memberId").empty()
+            $("#memberName").val("")
+            $("#memberId").append("<option value='-1'>==请先搜索==</option>")
+            if (type == 1){
+                $("#timeDiv").attr("style","display:none");
+            }else{
+                $("#timeDiv").attr("style","display:block");
+            }
+        }
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                let memberId = $("#memberId").val()
+                let type = $("#type").val()
+                let vipEndTime = $("#vipEndTime").val()
+                let vipStartTime = $("#vipStartTime").val()
+                if (memberId == -1){
+                    $.modal.msg("请选择用户", modal_status.FAIL);
+                    return ;
+                }
+                if (type==0 && (vipStartTime == null || vipEndTime == null)){
+                    $.modal.msg("vip开始时间或结束时间不能为空", modal_status.FAIL);
+                    return ;
+                }
+                $.operate.save(prefix + "/editVip", $('#form-member-add').serialize());
+            }
+        }
+
+        function showMemberName (){
+            let obj=document.getElementById("memberId");
+            let text = '';
+            for( i=0;i<obj.length;i++) {//下拉框的长度就是它的选项数.
+                if(obj[i].selected==true) {
+                    text=obj[i].text;//获取当前选择项的文本.
+                }
+            }
+            $("#memberName").val(text);
+        }
+
+        function searchMemberName(){
+            let name = $("#memberName").val()
+            let type = $("#type").val()
+            $.ajax({
+                url:prefix+"/findMemberByName",
+                data:{
+                    name: name,
+                    type: type,
+                },
+                type:"get",
+                dataType:"json",
+                success:function (data) {
+                    let father = data;
+                    document.getElementById("memberId").options.length = 0;
+                    if (father.length === 0){
+                        $("#memberId").append("<option value='-1'>==无结果请重新查询==</option>")
+                    }else {
+                        if (father[0].id != null) {
+                            $("#memberId").append("<option value='-1'>==请选择==</option>")
+                        }
+                        for (let i = 0; i < father.length; i++) {
+                            $("#memberId").append("<option value='" + father[i].id + "'>" + father[i].name + "</option>")
+                        }
+                    }
+                }
+            })
+        }
+
+        $("input[name='vipEndTime']").datetimepicker({
+            format: "yyyy-mm-dd HH:ii:ss",
+            minuteStep: 1
+        }).on("click",function(ev){
+            $("input[name='vipEndTime']").datetimepicker("setStartDate", $("input[name='vipStartTime']").val());
+        });
+        $("input[name='vipStartTime']").datetimepicker({
+            format: "yyyy-mm-dd HH:ii:ss",
+            minuteStep: 1
+        }).on("click",function(ev){
+            $("input[name='vipStartTime']").datetimepicker("setEndDate", $("input[name='vipEndTime']").val());
+        });
+
+    </script>
+</body>
+</html>

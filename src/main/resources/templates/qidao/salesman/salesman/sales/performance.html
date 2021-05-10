@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('销售关联组织机构列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>推广人员：</p>
+                            <input type="text" name="salesmanName" placeholder="请输入推广人用户名"/>
+                        </li>
+                        <li class="select-time">
+                            <p>推广周期：</p>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><em
+                                    class="fa fa-search"></em>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><em
+                                    class="fa fa-refresh"></em>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="salesman:sales:export">
+                <em class="fa fa-download"></em> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('salesman:sales:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('salesman:sales:remove')}]];
+    var prefix = ctx + "salesman/sales";
+
+    $(function () {
+        var options = {
+            url: prefix + "/getPerformanceList",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            logicRemoveUrl: prefix + "/logicRemove",
+            exportUrl: prefix + "/export",
+            modalName: "销售关联组织机构",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'salesmanName',
+                    title: '运营人员姓名',
+                },
+                {
+                    field: 'equipments',
+                    title: '组织发布成果数',
+                },
+                {
+                    field: 'performance',
+                    title: '推广数量',
+                },
+                {
+                    field: 'salesmanId',
+                    title: '推广人标识',
+                    visible: false,
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="getSalesList(\'' + row.salesmanId + '\')"><em class="fa fa-edit"></em>查看</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    function getSalesList(salesmanId) {
+        var url = $.operate.editUrl(salesmanId);
+        var title = '推广列表';
+        var width = null;
+        var height = null;
+        //如果是移动端，就使用自适应大小弹窗
+        if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+            width = 'auto';
+            height = 'auto';
+        }
+        if ($.common.isEmpty(title)) {
+            title = false;
+        }
+        if ($.common.isEmpty(url)) {
+            url = "/404.html";
+        }
+        if ($.common.isEmpty(width)) {
+            width = 800;
+        }
+        if ($.common.isEmpty(height)) {
+            height = ($(window).height() - 50);
+        }
+        layer.open({
+            type: 2,
+            area: [width + 'px', height + 'px'],
+            fix: false,
+            //不固定
+            maxmin: true,
+            shade: 0.3,
+            title: title,
+            content: url,
+            btn: ['关闭'],
+            // 弹层外区域关闭
+            shadeClose: true,
+            cancel: function(index) {
+                return true;
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.organization.organization.mapper.CustomOrganizationMapper">
+    
+    <resultMap type="com.qidao.qidao.organization.organization.domain.Organization" id="OrganizationResult">
+        <result property="verifyReason"    column="verify_reason"    />
+        <result property="verifyStatus"    column="verify_status"    />
+        <result property="vipEndTime"    column="vip_end_time"    />
+        <result property="vipStartTime"    column="vip_start_time"    />
+        <result property="status"    column="status"    />
+        <result property="techScaleId"    column="tech_scale_id"    />
+        <result property="addressDetail"    column="address_detail"    />
+        <result property="addressAreaName"    column="address_area_name"    />
+        <result property="addressAreaId"    column="address_area_id"    />
+        <result property="addressCityName"    column="address_city_name"    />
+        <result property="addressCityId"    column="address_city_id"    />
+        <result property="addressProvinceName"    column="address_province_name"    />
+        <result property="addressProvinceId"    column="address_province_id"    />
+        <result property="qualifications"    column="qualifications"    />
+        <result property="license"    column="license"    />
+        <result property="signTime"    column="sign_time"    />
+        <result property="scaleId"    column="scale_id"    />
+        <result property="fundsId"    column="funds_id"    />
+        <result property="industryRemark"    column="industry_remark"    />
+        <result property="industryId"    column="industry_id"    />
+        <result property="summary"    column="summary"    />
+        <result property="name"    column="name"    />
+        <result property="backendImage"    column="backend_image"    />
+        <result property="responsibleMemberId"    column="responsible_member_id"    />
+        <result property="type"    column="type"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+
+    <select id="findByNameAndTypeAndBelong" resultMap="OrganizationResult">
+
+         select  * from  organization o where  o.name = #{name} and o.type = #{type} and o.belong = #{belong}
+
+
+    </select>
+
+    <select id="organizationList" resultMap="OrganizationResult">
+
+        SELECT
+            o.id,
+            o.address_area_id,
+            o.address_area_name,
+            o.address_city_id,
+            o.address_city_name,
+            o.address_province_id,
+            o.address_province_name,
+            o.sign_time,
+            o.vip_end_time,
+            o.vip_start_time,
+            o.license,
+            o.qualifications,
+            o.scale_id,
+            o. STATUS,
+            o. STATUS,
+            o.verify_reason,
+            o.address_detail
+        FROM
+            organization o
+
+            <if test="name!=null and name!=''">
+                and o.name like concat(concat('%',#{name}),'%')
+            </if>
+
+            and o.del_flag = 0 order by o.id desc
+    </select>
+    <select id="getOrganizationList"
+            resultType="com.qidao.qidao.organization.organization.domain.OrganizationListRes"
+            parameterType="com.qidao.qidao.organization.organization.domain.OrganizationListReq">
+
+        SELECT
+               o.id,
+               o.belong,
+               o.name,
+               o.summary,
+               o.type,
+               o.address_detail addressDetail,
+               o.address_area_name addressAreaName,
+               o.address_city_name addressCityName,
+               o.address_province_name addressProvinceName,
+               o.sign_time signTime,
+               o.industry_remark industryRemark,
+               o.vip_start_time vipStartTime,
+               o.vip_end_time vipEndTime,
+               o.status,
+               o.verify_status verifyStatus,
+               m.`name` responsibleMemberName,
+               sc.val industry
+        FROM `organization` o
+            LEFT JOIN `member` m on o.responsible_member_id = m.id
+            LEFT JOIN `select_config` sc on o.industry_id = sc.id and sc.status = 0 and sc.del_flag = 0
+        WHERE o.del_flag = 0
+    <if test="name!=null and name!=''">
+        and o.name like concat(concat('%',#{name}),'%')
+    </if>
+        order  by o.sign_time desc
+    </select>
+
+
+</mapper>

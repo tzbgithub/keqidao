@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.server.server.mapper.CustomServerMapper">
+    <select id="findServer" resultType="com.qidao.qidao.server.server.domain.ServerListRes">
+        SELECT s.id , s.title , s.create_time createTime , m.`name` memberName , sc.val specArea , s.status
+        from `server` s
+                 LEFT JOIN `member` m on s.member_id_party_a = m.id and m.del_flag = 0
+                 LEFT JOIN `select_config` sc on s.spec_area_id = sc.id and sc.del_flag = 0 and sc.`status` = 0
+        where s.del_flag = 0
+        <if test="status != null and status >= 0 ">
+            and s.status = #{status}
+        </if>
+        <if test="title != null and title != '' ">
+            and s.title like
+            concat(concat('%',#{title}),'%')
+        </if>
+        <if test="startTime != '' and endTime != ''">
+            and s.create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and s.create_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and s.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="specAreaId != null and specAreaId >= 0">
+            and s.spec_area_id = #{specAreaId}
+        </if>
+order by s.create_time desc
+    </select>
+    <select id="serverDescription" resultType="com.qidao.qidao.server.server.domain.ServerDescriptionRes">
+        SELECT s.id , s.title ,  ar.val specArea , s.status , am.val specAmount , CONCAT(s.address_province_name,s.address_city_name,s.address_area_name) address , s.solution_time solutionTime , s.description, s.url
+        from `server` s
+                 LEFT JOIN `select_config` ar on s.spec_area_id = ar.id and ar.del_flag = 0 and ar.`status` = 0
+                 LEFT JOIN `select_config` am on s.spec_amount_id = am.id and am.del_flag = 0 and am.`status` = 0
+        where s.del_flag = 0 and s.id = #{id}
+    </select>
+</mapper>

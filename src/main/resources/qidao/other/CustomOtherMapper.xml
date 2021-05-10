@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.config.other.mapper.CustomOtherMapper">
+    <resultMap id="IndexCountMap" type="com.qidao.qidao.config.other.domain.IndexCountRes">
+        <result column="yesterdayNewUser"  property="yesterdayNewUser" jdbcType="INTEGER"/>
+        <result column="yesterdayNewEnterprise"  property="yesterdayNewEnterprise" jdbcType="INTEGER"/>
+        <result column="yesterdayNewLab"  property="yesterdayNewLab" jdbcType="INTEGER"/>
+        <result column="yesterdayNewDynamic"  property="yesterdayNewDynamic" jdbcType="INTEGER"/>
+        <result column="yesterdayNewServer"  property="yesterdayNewServer" jdbcType="INTEGER"/>
+        <result column="yesterdayNewContract"  property="yesterdayNewContract" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="IndexChartMap" type="com.qidao.qidao.config.other.domain.IndexChartDAO">
+        <result column="create_time"  property="time" jdbcType="VARCHAR"/>
+        <result column="count"  property="count" jdbcType="INTEGER"/>
+        <result column="type"  property="type" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="indexCount" resultMap="IndexCountMap">
+        SELECT sum(yesterdayNewUser) yesterdayNewUser,
+               sum(yesterdayNewEnterprise) yesterdayNewEnterprise,
+               sum(yesterdayNewLab) yesterdayNewLab,
+               sum(yesterdayNewDynamic) yesterdayNewDynamic,
+               sum(yesterdayNewServer) yesterdayNewServer,
+               sum(yesterdayNewContract) yesterdayNewContract
+        FROM (
+                 select COUNT(*) yesterdayNewUser,
+                        0        yesterdayNewEnterprise,
+                        0        yesterdayNewLab,
+                        0        yesterdayNewDynamic,
+                        0        yesterdayNewServer,
+                        0        yesterdayNewContract
+                 FROM member m
+                 where m.create_time BETWEEN #{beginTime} AND #{endTime}
+
+                 union all
+
+                 -- 0-实验室；1-公司
+                 SELECT 0        yesterdayNewUser,
+                        COUNT(*) yesterdayNewEnterprise,
+                        0        yesterdayNewLab,
+                        0        yesterdayNewDynamic,
+                        0        yesterdayNewServer,
+                        0        yesterdayNewContract
+                 FROM organization o1
+                 where o1.type = 1
+                   and o1.create_time BETWEEN #{beginTime} AND #{endTime}
+
+                 union all
+
+
+                 SELECT 0        yesterdayNewUser,
+                        0        yesterdayNewEnterprise,
+                        COUNT(*) yesterdayNewLab,
+                        0        yesterdayNewDynamic,
+                        0        yesterdayNewServer,
+                        0        yesterdayNewContract
+                 FROM organization o2
+                 -- 0-实验室；1-公司
+                 where o2.type = 0
+                   and o2.create_time BETWEEN #{beginTime} AND #{endTime}
+
+                 union ALL
+                 select 0        yesterdayNewUser,
+                        0        yesterdayNewEnterprise,
+                        0        yesterdayNewLab,
+                        COUNT(*) yesterdayNewDynamic,
+                        0        yesterdayNewServer,
+                        0        yesterdayNewContract
+                 FROM dynamic d
+                 where d.create_time BETWEEN #{beginTime} AND #{endTime}
+
+
+                 union ALL
+                 select 0        yesterdayNewUser,
+                        0        yesterdayNewEnterprise,
+                        0        yesterdayNewLab,
+                        0        yesterdayNewDynamic,
+                        COUNT(*) yesterdayNewServer,
+                        0        yesterdayNewContract
+                 FROM `server` s
+                 where s.create_time BETWEEN #{beginTime} AND #{endTime}
+
+
+                 union ALL
+                 -- status 合同状态：0-草稿；1-已确定合同(进度已确定)；2-已签订合同(合同生效)；3-进度已完成
+                 select 0        yesterdayNewUser,
+                        0        yesterdayNewEnterprise,
+                        0        yesterdayNewLab,
+                        0        yesterdayNewDynamic,
+                        0        yesterdayNewServer,
+                        COUNT(*) yesterdayNewContract
+                 FROM contract c
+                 where c.status = 2
+                   and c.create_time BETWEEN #{beginTime} AND #{endTime}
+             ) t
+    </select>
+
+    <select id="queryLineChart" resultMap="IndexChartMap">
+        select 0 type,SUBSTRING(create_time,1,10) create_time, count(*)  as count from member group by SUBSTRING(create_time,1,10)
+        having create_time > SUBDATE(NOW(),INTERVAL ${recentDay} DAY)
+        union all
+        select 1 type,SUBSTRING(create_time,1,10) create_time, count(*)  as count from organization where organization.type = 0 group by SUBSTRING(create_time,1,10)
+        having create_time > SUBDATE(NOW(),INTERVAL ${recentDay} DAY)
+        union all
+        select 2 type,SUBSTRING(create_time,1,10) create_time, count(*)  as count from organization where organization.type = 1 group by SUBSTRING(create_time,1,10)
+        having create_time > SUBDATE(NOW(),INTERVAL ${recentDay} DAY)
+        union all
+        select 3 type,SUBSTRING(create_time,1,10) create_time, count(*)  as count from dynamic  group by SUBSTRING(create_time,1,10)
+        having create_time > SUBDATE(NOW(),INTERVAL ${recentDay} DAY)
+        union all
+        select 4 type,SUBSTRING(create_time,1,10) create_time, count(*)  as count from `server` group by SUBSTRING(create_time,1,10)
+        having create_time > SUBDATE(NOW(),INTERVAL ${recentDay} DAY)
+        union all
+        select 5 type,SUBSTRING(create_time,1,10) create_time, count(*)  as count from contract group by SUBSTRING(create_time,1,10)
+        having create_time > SUBDATE(NOW(),INTERVAL ${recentDay} DAY)
+        ;
+    </select>
+</mapper>

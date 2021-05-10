@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增服务(需求)')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-server-add">
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">标题：</label>
+            <div class="col-sm-8">
+                <input name="title" maxlength="32" id="title" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">运营人员：</label>
+            <div class="col-sm-3">
+                <input id="salesmanName" placeholder="用户名/手机号" class="form-control" type="text" >
+            </div>
+            <div class="col-sm-1">
+                <btn class="btn btn-info  btn-sm" onclick="searchSalesmanName()"><i class="fa fa-search"></i>搜索</btn>
+            </div>
+            <div class="col-sm-4">
+                <select name="memberId" onchange="showV()" id="salesmanId" class="form-control" required>
+                    <option value="-1">==请先搜索==</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">发布人：</label>
+            <div class="col-sm-8">
+                <select name="memberId"  id="memberId" onchange="findLabels()" class="form-control" required>
+                    <option value="-1">==请先选择运营人员==</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">需求领域：</label><br>
+            <div class="col-sm-8">
+                <select id="specAreaId" name="specAreaId" class="form-control">
+
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">实验室地址：</label>
+            <div class="col-sm-8">
+                <select id="province" name="province" onchange="getCity()" class="form-control">
+                    <option value="0">---请选择省---</option>
+                </select>
+                <select id="city" name="city" onchange="getArea()" class="form-control">
+                    <option value="0">---请选择市---</option>
+                </select>
+                <select id="area" name="area" class="form-control">
+                    <option value="0">---请选择区---</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">研发经费：</label><br>
+            <div class="col-sm-8">
+                <select id="specAmountId" name="specAmountId" class="form-control">
+
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">期望解决时间：</label><br>
+            <div class="col-sm-8">
+                <input type="date" class="form-control" id="solutionTime" name="solutionTime" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">需求描述：</label>
+            <div class="col-sm-8">
+                <textarea name="description" id="description" class="form-control" rows="3" required></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">描述文件：</label>
+            <div class="col-sm-8">
+                <th:block th:include="code :: upload_html(imgId='url')"/>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<th:block th:include="include :: bootstrap-fileinput-js"/>
+<th:block th:include="code :: cos_img_js('url')"/>
+<script type="text/javascript">
+    var prefix = ctx + "server/server"
+    var addressPrefix = ctx + "address";
+    var configPrefix = ctx + "config/select/getConfigByType/";
+    var salesmanPrefix = ctx+"salesman/salesman/getListSalesman"
+
+
+    function searchSalesmanName(){
+        $.ajax({
+            url: salesmanPrefix,
+            data:{
+                code: $("#salesmanName").val()
+            },
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                let father = data;
+                document.getElementById("salesmanId").options.length = 0;
+                if (father.length === 0){
+                    $("#salesmanId").append("<option value='-1'>==无结果请重新查询==</option>")
+                }else {
+                    if (father[0].id != null) {
+                        $("#salesmanId").append("<option value='-1'>==请选择==</option>")
+                    }
+                    for (let i = 0; i < father.length; i++) {
+                        $("#salesmanId").append("<option value='" + father[i].id + "'>" + father[i].name + "</option>")
+                    }
+                }
+            }
+        })
+    }
+    function showV (){
+        let obj=document.getElementById("salesmanId");
+        let text = '';
+        let id = '';
+        for( i=0;i<obj.length;i++) {//下拉框的长度就是它的选项数.
+            if(obj[i].selected==true) {
+                text=obj[i].text;//获取当前选择项的文本.
+                id=obj[i].value;//获取当前选择项的文本.
+            }
+        }
+        $("#salesmanName").val(text);
+        $.ajax({
+            url: ctx+"member/member/getSalesmanMember",
+            data: {
+                salesmanId: id
+            },
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                let father = data;
+                document.getElementById("memberId").options.length = 0;
+                if (father.length === 0){
+                    $("#memberId").append("<option value='-1'>==无授权用户==</option>")
+                }else {
+                    if (father[0].id != null) {
+                        $("#memberId").append("<option value='-1'>==请选择==</option>")
+                    }
+                    for (let i = 0; i < father.length; i++) {
+                        $("#memberId").append("<option value='" + father[i].id + "'>" + father[i].name + "</option>")
+                    }
+                }
+            }
+        })
+    }
+
+    function submitHandler() {
+
+        if ($("#title").val().length > 32){
+            $.modal.msg("标题长度不能大于32个字符", modal_status.FAIL);
+            return;
+        }
+
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        if (month < 10) {
+            month = "0" + month;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+        let nowDate = year + "-" + month + "-" + day;
+        let time = $("#solutionTime").val();
+        let memberIdPartyA = parseInt($("#memberIdPartyA").val());
+        let province = parseInt($("#province").val());
+        let city = parseInt($("#city").val());
+        let area = parseInt($("#area").val());
+        if (province === 0 || city === 0 || area === 0) {
+            $.modal.msg("请填写完整的地址", modal_status.FAIL);
+            return;
+        }
+        if (memberIdPartyA === 0) {
+            $.modal.msg("发布人不能为空", modal_status.FAIL);
+            return;
+        }
+        var arr = nowDate.split("-");
+        var starttime = new Date(arr[0], arr[1], arr[2]);
+        var starttimes = starttime.getTime();
+        var arrs = time.split("-");
+        var endTime = new Date(arrs[0], arrs[1], arrs[2]);
+        var endTimes = endTime.getTime();
+        // 进行日期比较
+        if (endTimes <= starttimes) {
+            $.modal.msg("期望解决日期不能小于或等于当前日期", modal_status.FAIL);
+            return;
+        }
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/save", {
+                addressProvinceName: $("#province").find("option:selected").text(),
+                addressProvinceId: $("#province").val(),
+                addressCityName: $("#city").find("option:selected").text(),
+                addressCityId: $("#city").val(),
+                addressAreaName: $("#area").find("option:selected").text(),
+                addressAreaId: $("#area").val(),
+                title: $("#title").val(),
+                specAreaId: $("#specAreaId").val(),
+                specAmountId: $("#specAmountId").val(),
+                solutionTime: $("#solutionTime").val(),
+                description: $("#description").val(),
+                url: $("#url").val(),
+                memberIdPartyA: $("#memberIdPartyA").val()
+            });
+        }
+
+    }
+
+
+    $("#form-server-add").validate({
+        focusCleanup: true
+    });
+
+    function getCity() {
+        let val = $("#province").val();
+        $.ajax({
+            url: addressPrefix + "/getCity/" + val,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#city").empty();
+                $("#city").append("<option value='0'>---请选择市---</option>")
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for (let i = 0; i < data.length; i++) {
+                    $("#city").append("<option value='" + data[i].cityCode + "'>" + data[i].cityName + "</option>")
+                }
+            }
+        })
+    }
+
+    function getArea() {
+        let val = $("#city").val();
+        $.ajax({
+            url: addressPrefix + "/getArea/" + val,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $("#area").empty();
+                $("#area").append("<option value='0'>---请选择区---</option>")
+                for (let i = 0; i < data.length; i++) {
+                    $("#area").append("<option value='" + data[i].areaCode + "'>" + data[i].areaName + "</option>")
+                }
+            }
+        })
+    }
+
+    $(function () {
+        //省
+        $.ajax({
+            url: addressPrefix + "/getProvince",
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    $("#province").append("<option value='" + data[i].provinceCode + "'>" + data[i].provinceName + "</option>")
+                }
+            }
+        })
+        //需求领域 0
+        $.ajax({
+            url: configPrefix + 0,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    $("#specAreaId").append("<option value='" + data[i].id + "'>" + data[i].val + "</option>")
+                }
+            }
+        })
+        //研发经费 3
+        $.ajax({
+            url: configPrefix + 3,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    $("#specAmountId").append("<option value='" + data[i].id + "'>" + data[i].val + "</option>")
+                }
+            }
+        })
+    })
+    $("input[name='solutionTime']").datetimepicker({
+        format: "yyyy-mm-dd",
+        minView: "month",
+        autoclose: true
+    });
+</script>
+</body>
+</html>

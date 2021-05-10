@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改消息菜单类型')" />
+    <th:block th:include="include :: bootstrap-fileinput-css"/>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-menu-edit" th:object="${tMsgMenu}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">名字：</label>
+                <div class="col-sm-8">
+                    <input name="name" maxlength="8" th:field="*{name}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">上级菜单：</label>
+                <div class="col-sm-8">
+                    <select name="pid" id="pid" class="form-control m-b">
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">封面图：</label>
+                <div class="col-sm-8">
+                    <th:block th:include="code :: upload_html(imgId='thumb',showVal=*{thumb})" />
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">状态：</label>
+                <div class="col-sm-8">
+                    <select name="status" th:field="*{status}" class="form-control m-b">
+                        <option value="0">正常</option>
+                        <option value="1">停用</option>
+                    </select>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: bootstrap-fileinput-js"/>
+    <th:block th:include="code :: cos_img_js('thumb')"/>
+    <script type="text/javascript">
+        var prefix = ctx + "msg/menu";
+
+        var pid = [[${tMsgMenu.pid}]];
+        $("#form-menu-edit").validate({
+            focusCleanup: true
+        });
+
+        function showFather(){
+            $.ajax({
+                url: prefix+"/getFather",
+                data: {},
+                type: "get",
+                dataType: "json",
+                success: function (data){
+
+                }
+            })
+        }
+
+        $(function (){
+            $.ajax({
+                url: prefix+"/getFather/"+[[${tMsgMenu.id}]],
+                data: {},
+                type: "get",
+                dataType: "json",
+                success: function (data){
+                    $("#pid").append("<option value='0'>---无上级菜单---</option>")
+                    for (let i = 0; i < data.length; i++) {
+                        $("#pid").append("<option value='" + data[i].id + "'>" + data[i].name + "</option>")
+                    }
+                    $("#pid").find("option[value='" + pid + "']").attr("selected", true);
+                }
+            })
+        })
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/update", $('#form-menu-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

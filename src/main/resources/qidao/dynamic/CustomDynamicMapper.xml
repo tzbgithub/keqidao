@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.dynamic.mapper.CustomDynamicMapper">
+    <insert id="insertChannel">
+        insert into `link_dynamic_channel` (id , dynamic_id , channel_id) values ( #{id} ,#{dynamicId} , #{channelId})
+    </insert>
+    <update id="verifyDynamicPass">
+        update `dynamic` set verify_status = 1 , verify_user_id = #{userId} where id = #{id}
+    </update>
+    <update id="verifyDynamicFailed">
+        update `dynamic` set verify_status = 2 , verify_user_id = #{userId} where id = #{id}
+    </update>
+    <update id="approvalDynamicPass">
+        update `dynamic` set verify_status = 3 , recheck_id = #{userId} where id = #{id}
+    </update>
+    <update id="approvalDynamicFailed">
+        update `dynamic` set verify_status = 2 , recheck_id = #{userId} where id = #{id}
+    </update>
+    <update id="deleteChannel">
+        update `link_dynamic_channel` set del_flag = 1 where dynamic_id = #{dynamicId}
+    </update>
+    <update id="checkPending">
+        update `dynamic` set verify_status = 0 , recheck_id = #{userId} where id = #{id}
+    </update>
+
+
+    <select id="getDynamic" resultType="com.qidao.qidao.dynamic.domain.CustomDynamic">
+        SELECT m.`name` memberName , GROUP_CONCAT(c.title) channel,
+        d.id , d.title , d.like_num likeNum , d.comment_num commentNum ,
+        d.publish_time publishTime , d.verify_status verifyStatus , d.verify_reason verifyReason,
+        d.verify_user_id verifyUserId ,d.recheck_id recheckId , d.need_vip needVip ,d.hot ,
+        d.img,d.video,d.thumb
+        FROM `dynamic` d
+        LEFT JOIN `member` m on d.member_id = m.id and m.del_flag = 0
+        LEFT JOIN link_dynamic_channel ldc on d.id = ldc.dynamic_id and ldc.del_flag = 0
+        LEFT JOIN channel c on ldc.channel_id = c.id and c.del_flag = 0
+        where d.del_flag = 0 and m.verify_status = 2
+        <if test="memberName != null and memberName != '' ">
+            and m.name like
+            concat(concat('%',#{memberName}),'%')
+        </if>
+        <if test="status != null and status >= 0 ">
+            and d.verify_status = #{status}
+        </if>
+        <if test="title != null and title != '' ">
+            and d.title like
+            concat(concat('%',#{title}),'%')
+        </if>
+        <if test="startTime != '' and endTime != ''">
+            and d.publish_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and d.publish_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and d.publish_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+group by d.id
+order by d.verify_status asc , m.level desc , d.publish_time asc
+    </select>
+    <select id="getDynamicById" resultType="com.qidao.qidao.dynamic.domain.DynamicById">
+        SELECT m.`name` memberName , d.content ,
+               d.id , d.title , d.like_num likeNum , d.comment_num commentNum ,
+               d.publish_time publishTime , d.verify_status verifyStatus , d.verify_reason verifyReason,
+               d.verify_user_id verifyUserId ,d.recheck_id recheckId , d.need_vip needVip ,d.hot ,
+               d.img,d.video,d.thumb,d.url,
+               c.title channel , c.id channelId
+        FROM `dynamic` d
+                 LEFT JOIN `member` m on d.member_id = m.id and m.del_flag = 0
+                 left join `link_dynamic_channel` ldc on d.id = ldc.dynamic_id and ldc.del_flag = 0
+                 LEFT JOIN `channel` c on ldc.channel_id = c.id and c.del_flag = 0
+        where d.del_flag = 0 and  d.id=#{id}
+    </select>
+
+    <select id="getChannel" resultType="com.qidao.qidao.dynamic.domain.DynamicChannel">
+        select id channelId , title from `channel` where del_flag = 0 order by sequence desc
+    </select>
+    <select id="getMember" resultType="com.qidao.qidao.dynamic.domain.MemberInfo">
+        select m.id , m.`name` from member m
+        left join `organization` o on m.organization_id = o.id
+        where m.del_flag = 0 and o.type = 0
+        <if test="name != null and name != ''">
+            and (
+                m.name like concat(concat('%',#{name}),'%')
+                or
+                m.phone like concat(concat('%',#{name}),'%')
+            )
+        </if>
+    </select>
+    <select id="getDynamicByIds" resultType="com.qidao.qidao.dynamic.domain.CustomDynamic">
+        select id , member_id memberId from `dynamic` where del_flag = 0 and id in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="allData" resultType="java.lang.Integer">
+        select COUNT(*)
+        FROM `dynamic`
+    </select>
+
+    <select id="verifyData" resultType="java.lang.Integer">
+        select COUNT(*)
+        FROM `dynamic`
+        where verify_status = 0 or verify_status = 1
+    </select>
+    <select id="getYesterdayData" resultType="java.lang.Integer">
+        select COUNT(*)
+        FROM `dynamic`
+        where create_time BETWEEN #{startTime} and #{endTime}
+    </select>
+
+</mapper>

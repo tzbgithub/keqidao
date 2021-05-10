@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qidao.qidao.advertise.advertise.mapper.CustomAdvertiseMapper">
+    <select id="findAdvertise" resultType="com.qidao.qidao.advertise.advertise.domain.AdvertiseListRes">
+        SELECT a.id , a.img, a.title , c.`name` canal , sc.val location , a.link_url linkUrl ,c.id canalId, a.`status` , a.create_by createById , a.create_time createTime , a.begin_time beginTime , a.end_time endTime
+        FROM `advertise` a
+                 LEFT JOIN `link_advertise_canal` lac on a.id = lac.advertise_id and lac.del_flag = 0
+                 LEFT JOIN `canal` c on lac.canal_id = c.id and c.del_flag = 0
+                 LEFT JOIN `select_config` sc on a.location = sc.id and sc.`status` = 0 and sc.del_flag = 0
+        where a.del_flag = 0
+        <if test="status != null and status >= 0">
+            and a.status = #{status}
+        </if>
+        <if test="title != null and title != '' ">
+            and a.title like
+            concat(concat('%',#{title}),'%')
+        </if>
+        <if test="startTime != '' and endTime != ''">
+            and a.create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and a.create_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and a.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="location != null ">
+            and sc.id = #{location}
+        </if>
+        <if test="canal != null ">
+            and c.id = #{canal}
+        </if>
+        order by a.sequence desc
+    </select>
+    <select id="findAdvertiseDescription"
+            resultType="com.qidao.qidao.advertise.advertise.domain.AdvertiseDescriptionRes">
+        SELECT a.id , a.img, a.title , c.`name` canal , sc.val location , a.link_url linkUrl ,
+               a.`status`  , a.create_time createTime , a.begin_time beginTime , a.end_time endTime,
+               c.id canalId , sc.id locationId , a.sequence , group_concat(ch.title) channel
+        FROM `advertise` a
+                 LEFT JOIN `link_advertise_canal` lac on a.id = lac.advertise_id and lac.del_flag = 0
+                 LEFT JOIN `canal` c on lac.canal_id = c.id and c.del_flag = 0
+                 LEFT JOIN `select_config` sc on a.location = sc.id and sc.`status` = 0 and sc.del_flag = 0
+                 LEFT JOIN `link_dynamic_channel` ldc on a.id = ldc.dynamic_id and ldc.type = 1 and ldc.del_flag = 0
+                 LEFT JOIN `channel` ch on ldc.channel_id = ch.id and ch.del_flag = 0 and sc.del_flag = 0
+        where a.del_flag = 0 and a.id = #{id} and c.id = #{canalId}
+    </select>
+</mapper>

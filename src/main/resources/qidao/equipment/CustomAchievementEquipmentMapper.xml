@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.equipment.equipment.mapper.CustomAchievementEquipmentMapper">
+
+    <select id="getEquipmentsByOrganizationId" resultType="java.lang.Integer">
+        select count(distinct id)
+        from achievement_equipment
+        <where>
+            <if test="organizationId != null">
+                and organization_id = #{organizationId}
+            </if>
+            and verify_status = 1
+            and del_flag = 0
+        </where>
+    </select>
+    <select id="findEquipmentPage"
+            resultType="com.qidao.qidao.equipment.equipment.domain.AchievementEquipmentPageRes">
+        SELECT
+               ae.id ,
+               ae.create_time createTime ,
+               ae.title ,
+               m.name memberName ,
+               ae.type ,
+               ae.verify_status,
+               o.`name` organizationName,
+               ae.verify_user_id verifyUserId
+        FROM `achievement_equipment` ae
+        LEFT JOIN `organization` o on ae.organization_id = o.id
+        LEFT JOIN `member` m on ae.member_id = m.id
+        WHERE ae.del_flag = 0 and o.del_flag = 0 and m.verify_status = 2
+        <if test="organization != null and organization != '' ">
+            and o.name like
+            concat(concat('%',#{organization}),'%')
+        </if>
+        <if test="verifyStatus != null">
+            and ae.verify_status = #{verifyStatus}
+        </if>
+        <if test="type != null">
+            and ae.type = #{type}
+        </if>
+        <if test="title != null and title != '' ">
+            and ae.title like
+            concat(concat('%',#{title}),'%')
+        </if>
+        <if test="startTime != '' and endTime != ''">
+            and ae.create_time between #{startTime} and #{endTime}
+        </if>
+        <if test="startTime != '' and endTime == ''">
+            and ae.create_time >= #{startTime}
+        </if>
+        <if test="endTime != '' and startTime == ''">
+            and ae.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        order by verify_status asc
+    </select>
+    <select id="findEquipmentDescription"
+            resultType="com.qidao.qidao.equipment.equipment.domain.AchievementEquipmentDescription">
+        SELECT
+            ae.id ,
+            ae.create_time createTime ,
+            ae.title ,
+            ae.type ,
+            ae.verify_status,
+            o.`name` organizationName ,
+            ae.imgs,
+            ae.content,
+            ae.summary,
+            ae.video,
+            ae.url,
+            sc.val maturity,
+            ct.val cooperation,
+            GROUP_CONCAT(s.val) articles,
+            GROUP_CONCAT(l.val) labels,
+            ae.thumb
+        FROM `achievement_equipment` ae
+                 LEFT JOIN `organization` o on ae.organization_id = o.id
+                 LEFT JOIN `select_config` sc on ae.maturity = sc.id and sc.`status` = 0 and sc.del_flag = 0
+                 LEFT JOIN `select_config` ct on ae.cooperation_type = ct.id and ct.`status` = 0 and ct.del_flag = 0
+                 LEFT JOIN `link_select` ls on ae.id = ls.source_id and ls.type = 13
+                 left join `select_config` s on ls.select_config_id = s.id
+                 left join `link_label` ll on ae.id = ll.source_id and ll.type = 5 and ll.del_flag = 0
+                 left join `label` l on ll.label_id = l.id and l.del_flag = 0
+        WHERE ae.del_flag = 0 and ae.id = #{id}
+    </select>
+
+</mapper>

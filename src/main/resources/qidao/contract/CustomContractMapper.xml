@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.contract.contract.mapper.CustomContractMapper">
+
+    <select id="selectContractList" resultType="com.qidao.qidao.contract.contract.domain.ContractRes">
+        select c.`id` id, c.`server_title` serverTitle,
+               c.`end_time` endTime, c.`sign_time` signTime, c.`no` noNumber,
+               a.`name` memberNamePartyA, b.`name` memberNamePartB
+        from `contract` c
+                left join `member` a on a.`id` = c.`member_id_party_a` and a.`del_flag` = 0
+                left join `member` b on b.`id` = c.`member_id_part_b` and b.`del_flag` = 0
+        where c.`del_flag` = 0 and c.`status` >= 2
+        <if test="serverTitle != null and serverTitle != ''">
+            and c.`server_title` like
+            concat(concat('%',#{serverTitle}),'%')
+        </if>
+        <if test="signTime != null">
+            and c.`sign_time` >= #{signTime}
+        </if>
+        <if test="endTime != null">
+            and c.`end_time` <![CDATA[ <= ]]> #{endTime}
+        </if>
+        order by c.`no` asc, c.`create_time` asc
+    </select>
+
+    <select id="allData" resultType="java.lang.Integer">
+        select COUNT(`id`)
+        from `contract`
+    </select>
+
+    <select id="getYesterdayData" resultType="java.lang.Integer">
+        select COUNT(`id`)
+        from `contract`
+        where `sign_time` between #{startTime} and #{endTime}
+    </select>
+
+    <select id="allMoney" resultType="java.lang.Integer">
+        select COUNT(`id`)
+        from `contract`
+    </select>
+
+    <select id="selectContract" resultType="com.qidao.qidao.contract.contract.domain.ContractRes">
+         select c.`id` id, c.`server_title` serverTitle,
+               c.`end_time` endTime, c.`sign_time` signTime, c.`no` noNumber,
+               a.`name` memberNamePartyA, b.`name` memberNamePartB
+        from `contract` c
+                left join `member` a on a.`id` = c.`member_id_party_a` and a.`del_flag` = 0
+                left join `member` b on b.`id` = c.`member_id_part_b` and b.`del_flag` = 0
+        where c.`del_flag` = 0 and c.`status` >= 2 and c.`id` = #{id}
+    </select>
+    <select id="selectContractDetailById"
+            resultType="com.qidao.qidao.contract.contract.domain.ContractDetailRes">
+        select c.`id` id, c.`server_title` serverTitle,
+               c.`end_time` endTime, c.`sign_time` signTime, c.`no` noNumber,
+               a.`name` memberNamePartyA, b.`name` memberNamePartB,
+               ma.`name` OrganizationNamePartA, mb.`name` OrganizationNamePartB,
+               c.`confirm_time` confirmTime, c.`status` status, c.`begin_time` beginTime,
+               c.`sign_address_province_name` signAddressProvinceName,
+               c.`sign_address_city_name` signAddressCityName,
+               c.`sign_address_area_name` signAddressAreaName,
+               c.`create_time` createTime
+        from `contract` c
+                left join `member` a on a.`id` = c.`member_id_party_a` and a.`del_flag` = 0
+                left join `member` b on b.`id` = c.`member_id_part_b` and b.`del_flag` = 0
+                left join `organization` ma on ma.`id` = c.`organization_id_party_a` and ma.`del_flag` = 0
+                left join `organization` mb on mb.`id` = c.`organization_id_party_b` and mb.`del_flag` = 0
+        where c.`del_flag` = 0 and c.`status` >= 0 and c.`id` = #{id}
+    </select>
+</mapper>

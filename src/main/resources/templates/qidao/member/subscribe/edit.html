@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('修改关注')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-TSubscribe-edit" th:object="${subscribe}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">用户名称：</label>
+            <div class="col-sm-8">
+                <input th:field="*{memberName}" class="form-control"
+                       type="text" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">类型：</label>
+            <div class="col-sm-8">
+                <select name="type" id="type" th:field="*{type}"  class="form-control">
+                    <option value="0">关注</option>
+                    <option value="1">屏蔽</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">对象用户：</label>
+            <div class="col-sm-3">
+                <input id="subscribeName" class="form-control" type="text">
+            </div>
+            <div class="col-sm-1">
+                <btn class="btn btn-info  btn-sm" onclick="searchSubscribe()"><i class="fa fa-search"></i>搜索</btn>
+            </div>
+            <div class="col-sm-4">
+                <select name="subscribeId" onchange="showSubscribeName()" id="subscribeId" class="form-control" required>
+                    <option value="-1">==请先搜索==</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<script type="text/javascript">
+    var prefix = ctx + "member/subscribe";
+
+    let subscribeId = [[${subscribe.subscribeId}]]
+
+    let memberId = [[${subscribe.memberId}]]
+
+    $("#form-TSubscribe-edit").validate({
+        focusCleanup: true
+    });
+
+    //findSubscribeMember
+    function searchSubscribe(){
+        $.ajax({
+            url: prefix+"/findSubscribeMember",
+            data: {
+                id: memberId,
+                name: $("#subscribeName").val()
+            },
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                let father = data;
+                document.getElementById("subscribeId").options.length = 0;
+                if (father.length === 0){
+                    $("#subscribeId").append("<option value='-1'>==无结果请重新查询==</option>")
+                }else {
+                    if (father[0].id != null){
+                        $("#subscribeId").append("<option value='-1'>==请选择==</option>")
+                    }
+                    for(let i = 0 ; i<father.length ; i++){
+                        $("#subscribeId").append("<option value='"+father[i].id+"'>"+father[i].name+"</option>")
+                    }
+                }
+
+            }
+        })
+    }
+
+    $(function (){
+        $.ajax({
+            url: prefix+"/getSubscribeMember/"+memberId,
+            data: {},
+            type: "get",
+            dataType: "json",
+            success: function (data){
+                for (let i = 0 ; i < data.length ; i++){
+                    $("#subscribeId").append("<option value='"+data[i].id+"'>"+data[i].name+"</option>")
+                }
+                $("#subscribeId").find("option[value='"+subscribeId+"']").attr("selected",true)
+                let obj=document.getElementById("subscribeId");
+                let text = '';
+                for( i=0;i<obj.length;i++) {//下拉框的长度就是它的选项数.
+                    if(obj[i].selected===true) {
+                        text=obj[i].text;//获取当前选择项的文本.
+                    }
+                }
+                $("#subscribeName").val(text);
+            }
+        })
+    })
+
+    function submitHandler() {
+        let subscribeId = $("#subscribeId").val()
+        if (subscribeId === -1){
+            $.model.msg("请选择操作对象用户",modal_status.FAIL)
+            return;
+        }
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/update", {
+                id: [[${subscribe.id}]],
+                type: $("#type").val(),
+                memberId: memberId,
+                subscribeId: $("#subscribeId").val(),
+                oldSubscribeId: [[${subscribe.subscribeId}]]
+            });
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qidao.qidao.invoice.invoice.mapper.InvoiceMapper">
+
+    <resultMap type="com.qidao.qidao.invoice.invoice.domain.Invoice" id="InvoiceResult">
+        <result property="status" column="status"/>
+        <result property="email" column="email"/>
+        <result property="remark" column="remark"/>
+        <result property="dutyParagraph" column="duty_paragraph"/>
+        <result property="invoiceHead" column="invoice_head"/>
+        <result property="type" column="type"/>
+        <result property="orderId" column="order_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="id" column="id"/>
+    </resultMap>
+
+    <sql id="selectInvoiceVo">
+        select status, email, remark, duty_paragraph, invoice_head, type, order_id, member_id, organization_id, del_flag, update_by, create_by, update_time, create_time, id from invoice
+    </sql>
+
+    <select id="selectInvoiceList" parameterType="com.qidao.qidao.invoice.invoice.domain.Invoice"
+            resultMap="InvoiceResult">
+        <include refid="selectInvoiceVo"/>
+        <where>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="email != null  and email != ''">and email = #{email}</if>
+            <if test="dutyParagraph != null  and dutyParagraph != ''">and duty_paragraph = #{dutyParagraph}</if>
+            <if test="invoiceHead != null  and invoiceHead != ''">and invoice_head = #{invoiceHead}</if>
+            <if test="type != null ">and type = #{type}</if>
+            <if test="orderId != null ">and order_id = #{orderId}</if>
+            <if test="memberId != null ">and member_id = #{memberId}</if>
+            <if test="organizationId != null ">and organization_id = #{organizationId}</if>
+            AND del_flag = 0
+        </where>
+        order by status asc, type asc, create_time asc
+    </select>
+
+    <select id="selectInvoiceById" parameterType="Long" resultMap="InvoiceResult">
+        <include refid="selectInvoiceVo"/>
+        where id = #{id}
+        AND del_flag = 0
+    </select>
+
+    <insert id="insertInvoice" parameterType="com.qidao.qidao.invoice.invoice.domain.Invoice">
+        insert into invoice
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="status != null ">status,</if>
+            <if test="email != null  and email != ''">email,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+            <if test="dutyParagraph != null  and dutyParagraph != ''">duty_paragraph,</if>
+            <if test="invoiceHead != null  and invoiceHead != ''">invoice_head,</if>
+            <if test="type != null ">type,</if>
+            <if test="orderId != null ">order_id,</if>
+            <if test="memberId != null ">member_id,</if>
+            <if test="organizationId != null ">organization_id,</if>
+            <if test="delFlag != null ">del_flag,</if>
+            <if test="updateBy != null ">update_by,</if>
+            <if test="createBy != null ">create_by,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="id != null ">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="status != null ">#{status},</if>
+            <if test="email != null  and email != ''">#{email},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="dutyParagraph != null  and dutyParagraph != ''">#{dutyParagraph},</if>
+            <if test="invoiceHead != null  and invoiceHead != ''">#{invoiceHead},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="orderId != null ">#{orderId},</if>
+            <if test="memberId != null ">#{memberId},</if>
+            <if test="organizationId != null ">#{organizationId},</if>
+            <if test="delFlag != null ">#{delFlag},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="id != null ">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updateInvoice" parameterType="com.qidao.qidao.invoice.invoice.domain.Invoice">
+        update invoice
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null ">status = #{status},</if>
+            <if test="email != null  and email != ''">email = #{email},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+            <if test="dutyParagraph != null  and dutyParagraph != ''">duty_paragraph = #{dutyParagraph},</if>
+            <if test="invoiceHead != null  and invoiceHead != ''">invoice_head = #{invoiceHead},</if>
+            <if test="type != null ">type = #{type},</if>
+            <if test="orderId != null ">order_id = #{orderId},</if>
+            <if test="memberId != null ">member_id = #{memberId},</if>
+            <if test="organizationId != null ">organization_id = #{organizationId},</if>
+            <if test="delFlag != null ">del_flag = #{delFlag},</if>
+            <if test="updateBy != null ">update_by = #{updateBy},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteInvoiceById" parameterType="Long">
+        delete from invoice where id = #{id}
+    </delete>
+
+    <delete id="deleteInvoiceByIds" parameterType="String">
+        delete from invoice where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <update id="logicDelByIds" parameterType="String">
+        update invoice
+        set del_flag = 1
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>
